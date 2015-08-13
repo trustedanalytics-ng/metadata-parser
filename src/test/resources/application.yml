@@ -1,0 +1,27 @@
+server:
+  port: 9090
+
+dependencies:
+  datacatalog: "${vcap.services.datacatalog.credentials.host:http://localhost:${server.port}}"
+  user-management: "${vcap.services.user-management.credentials.host:http://localhost:9999}"
+
+security:
+  ignored: /callbacks/**, /rest/datasets/*
+
+
+spring.oauth2.resource:
+    id: cloud_controller
+    jwt:
+      keyValue: FAKE_KEY_VALUE
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.trustedanalytics: DEBUG
+
+cf:
+  resource:
+
+
+
+

@@ -1,0 +1,14 @@
+---
+applications:
+- name: metadataparser 
+  memory: 512M
+  instances: 1
+  host: metadata 
+  path: target/metadata-parser-${version}.jar
+  services:
+    - datacatalog
+    - hdfs-instance
+    - user-management
+    - sso
+  env:
+    SPRING_PROFILES_ACTIVE: "insecure"
