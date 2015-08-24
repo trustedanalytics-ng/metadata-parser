@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.trustedanalytics</groupId>
         <artifactId>trustedanalytics-cloud-parent</artifactId>
-        <version>0.4.2-SNAPSHOT</version>
+        <version>0.4.3</version>
     </parent>
 
     <dependencies>
@@ -195,5 +195,10 @@
 
     <properties>
         <start-class>org.trustedanalytics.metadata.Main</start-class>
+
+        <jacoco-measurement-instructions>0.359</jacoco-measurement-instructions>    <!-- Value <0.000, 1.000>, at least 3 places after coma -->
+        <jacoco-measurement-branches>0.329</jacoco-measurement-branches>            <!-- Value <0.000, 1.000>, at least 3 places after coma -->
+        <jacoco-measurement-lines>0.386</jacoco-measurement-lines>                  <!-- Value <0.000, 1.000>, at least 3 places after coma -->
+        <jacoco-measurement-classes>0.241</jacoco-measurement-classes>              <!-- Value <0.000, 1.000>, at least 3 places after coma -->
     </properties>
 </project>
