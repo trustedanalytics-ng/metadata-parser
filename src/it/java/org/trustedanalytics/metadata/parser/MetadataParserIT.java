@@ -15,16 +15,6 @@
  */
 package org.trustedanalytics.metadata.parser;
 
-import org.trustedanalytics.cloud.auth.AuthTokenRetriever;
-import org.trustedanalytics.cloud.auth.HeaderAddingHttpInterceptor;
-import org.trustedanalytics.metadata.Main;
-import org.trustedanalytics.metadata.parser.api.Metadata;
-import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
-import org.trustedanalytics.metadata.parser.api.MetadataParseStatus;
-import org.trustedanalytics.metadata.parser.api.MetadataParserCallback;
-import org.trustedanalytics.metadata.security.authorization.Authorization;
-import org.trustedanalytics.store.MemoryObjectStore;
-import org.trustedanalytics.store.ObjectStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,8 +38,23 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
+import org.trustedanalytics.cloud.auth.AuthTokenRetriever;
+import org.trustedanalytics.cloud.auth.HeaderAddingHttpInterceptor;
+import org.trustedanalytics.metadata.Main;
+import org.trustedanalytics.metadata.datacatalog.DataCatalogFactory;
+import org.trustedanalytics.metadata.parser.api.Metadata;
+import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
+import org.trustedanalytics.metadata.parser.api.MetadataParseStatus;
+import org.trustedanalytics.metadata.parser.api.MetadataParserCallback;
+import org.trustedanalytics.metadata.security.authorization.Authorization;
+import org.trustedanalytics.store.MemoryObjectStore;
+import org.trustedanalytics.store.ObjectStore;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +72,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Main.class, MetadataParserIT.TestConfig.class})
@@ -77,8 +85,11 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles({"test"})
 public class MetadataParserIT {
 
-    @Value("http://localhost:${server.port}")
+    @Value("http://localhost:${local.server.port}")
     private String baseUrl;
+
+    @Value("${dependencies.datacatalog}:${local.server.port}")
+    private String dataCatalogUrl;
 
     @Autowired
     private String TOKEN;
@@ -90,6 +101,8 @@ public class MetadataParserIT {
     private AuthTokenRetriever tokenRetriever;
     @Autowired
     private CompletableFuture<Metadata> putMetadata;
+    @Autowired
+    private RuntimeConfigurableDataCatalogFactory dataCatalogFactory;
 
     private String idInStore;
     private TestRestTemplate testRestTemplate;
@@ -101,10 +114,14 @@ public class MetadataParserIT {
     @Autowired
     private Authorization authorization;
 
-    private final static UUID TEST_ORG_UUID = UUID.fromString("f02e100b-8390-463a-8165-180ea4dd88ee");
+    private final static UUID TEST_ORG_UUID =
+        UUID.fromString("f02e100b-8390-463a-8165-180ea4dd88ee");
 
     @Before
     public void before() throws IOException {
+
+        dataCatalogFactory.setDataCatalogUrl(dataCatalogUrl);
+
         source = "http://data.com/1234.csv";
         content = "testheader\ntestrow";
 
@@ -249,6 +266,11 @@ public class MetadataParserIT {
         public Authorization authorization() throws IOException, ServletException {
             return mock(Authorization.class);
         }
+
+        @Bean
+        public DataCatalogFactory dataCatalogFactory() throws IOException, ServletException {
+            return new RuntimeConfigurableDataCatalogFactory();
+        }
     }
 
 
@@ -275,7 +297,9 @@ public class MetadataParserIT {
         private CompletableFuture<Metadata> putMetadata;
 
         @RequestMapping(value = "/rest/datasets/{id}", method = RequestMethod.PUT)
-        public void putMetadata(@RequestBody Metadata metadata) { putMetadata.complete(metadata); }
+        public void putMetadata(@RequestBody Metadata metadata) {
+            putMetadata.complete(metadata);
+        }
     }
 
 

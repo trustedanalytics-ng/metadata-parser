@@ -1,8 +1,8 @@
 server:
-  port: 9090
+  port: 0
 
 dependencies:
-  datacatalog: "${vcap.services.datacatalog.credentials.host:http://localhost:${server.port}}"
+  datacatalog: "${vcap.services.datacatalog.credentials.host:http://localhost}"
   user-management: "${vcap.services.user-management.credentials.host:http://localhost:9999}"
 
 security:

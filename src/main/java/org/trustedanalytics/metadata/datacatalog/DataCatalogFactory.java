@@ -16,12 +16,14 @@
 package org.trustedanalytics.metadata.datacatalog;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 
 import java.util.Objects;
 
 @Service
+@Profile({"cloud", "default"})
 public class DataCatalogFactory {
 
   @Value("${dependencies.datacatalog}")
