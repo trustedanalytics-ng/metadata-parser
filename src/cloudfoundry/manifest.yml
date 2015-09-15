@@ -12,3 +12,4 @@ applications:
     - sso
   env:
     SPRING_PROFILES_ACTIVE: "insecure"
+    VERSION: ${version}
