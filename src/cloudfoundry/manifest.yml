@@ -10,6 +10,6 @@ applications:
     - hdfs-instance
     - user-management
     - sso
+    - kerberos-service
   env:
-    SPRING_PROFILES_ACTIVE: "insecure"
     VERSION: ${version}

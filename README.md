@@ -41,7 +41,12 @@ Following libraries are necessary to successfully build metadata-parser:
 
 ### Configuration
 
- * **HDFS_USER** - obligatory, set to 'cf'
+ * all configuration comes from bound services: 
+   - datacatalog
+   - hdfs-instance
+   - user-management
+   - sso
+   - kerberos-service 
 
 ### Build
 
@@ -61,6 +66,20 @@ To run the service:
 * Checkout documentation at http://localhost:8900/sdoc.jsp
 
 ### Deployment in a Kerberos-enabled environment 
-* `mvn verify`
-* Set `SPRING_PROFILES_ACTIVE: "secure"` in manifest.yml
-* `cf push`
+Application automatically bind to an existing kerberos-provide service. This will provide default kerberos configuration, for REALM and KDC host. Before deploy check:
+
+- if kerberos-service does not exists in your space, you can create it with command:
+```
+cf cups kerberos-service -p '{ "kdc": "kdc-host", "kpassword": "kerberos-password", "krealm": "kerberos-realm", "kuser": "kerberos-user" }'
+cf bs metadataparser kerberos-service
+```
+### Deployment in a Kerberos-disabled environment 
+Application automatically bind to an existing kerberos-provide service. This will provide technical user name. Before deploy check:
+
+- if kerberos-service does not exists in your space, you can create it with command:
+```
+cf cups kerberos-service -p '{ "kdc": "", "kpassword": "", "krealm": "", "kuser": "user-name" }'
+cf bs metadataparser kerberos-service
+```
+
+
