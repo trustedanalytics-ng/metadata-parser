@@ -55,7 +55,7 @@ public class MetadataParserController {
 
   @RequestMapping(method = POST)
   @ResponseStatus(ACCEPTED)
-  public void extractMetadata(@RequestBody MetadataParseRequest request) {
+  public void extractMetadata(@RequestBody MetadataParseRequest request) throws Exception {
     // Extracting of authentication needs to happen on thread that has access to request scope
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     final RestOperations restOperations = restOperationsFactory.oAuth(authentication);

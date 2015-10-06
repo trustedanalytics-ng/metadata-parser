@@ -18,8 +18,13 @@ package org.trustedanalytics.metadata.parser.api;
 import java.net.URI;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.trustedanalytics.metadata.parser.ParseTaskFactory;
+
 public class MetadataParseRequest {
 
+   
     private String id;
     private URI source;
     private String idInObjectStore;
@@ -98,5 +103,22 @@ public class MetadataParseRequest {
         return "MetadataParseRequest [id=" + id + ", source=" + source + ", idInObjectStore="
                 + idInObjectStore + ", callbackUrl=" + callbackUrl + ", title=" + title
                 + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
+    }
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataParseRequest.class);
+    
+    private static final CharSequence HDFS_FULL_PATH_INDICATOR = "hdfs://";
+    
+    public void adjustHdfsRequest(String objectStoreId) throws Exception {    
+        int objectStorePartIdx = source.toString().indexOf(objectStoreId);
+        if (objectStorePartIdx == -1) {
+            throw (new Exception("Hdfs path "+ source +" is outside current object store: " + objectStoreId));
+        }               
+        this.idInObjectStore = source.toString().substring(objectStorePartIdx + objectStoreId.length());
+        LOGGER.info(toString());
+    }
+    
+    public boolean isFullHdfsPath() {
+        return source.toString().contains(HDFS_FULL_PATH_INDICATOR);
     }
 }

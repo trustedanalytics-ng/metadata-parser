@@ -13,3 +13,4 @@ applications:
     - kerberos-service
   env:
     VERSION: ${version}
+    JBP_CONFIG_OPEN_JDK_JRE: '[memory_sizes: {metaspace: 128m..}]'

@@ -16,6 +16,8 @@
 package org.trustedanalytics.metadata.parser;
 
 import org.trustedanalytics.metadata.datacatalog.DataCatalog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
@@ -25,6 +27,8 @@ import org.trustedanalytics.store.ObjectStore;
 
 @Service
 public class ParseTaskFactory {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseTaskFactory.class);
 
     private final ObjectStore objectStore;
     private final ParserService parserService;
@@ -35,8 +39,15 @@ public class ParseTaskFactory {
         this.parserService = parserService;
     }
 
-    public MetadataParseTask newParseTask(MetadataParseRequest desc, DataCatalog dataCatalog, RestOperations restOperations) {
-        return new MetadataParseTask(objectStore, dataCatalog, desc, restOperations, parserService);
+    public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog, RestOperations restOperations) throws Exception {
+        
+        if (request.isFullHdfsPath()) {
+            LOGGER.info("Adjusting hdfs request");
+            request.adjustHdfsRequest(objectStore.getId());
+        }
+        
+        LOGGER.info("Creating task for request: " + request.toString());
+        return new MetadataParseTask(objectStore, dataCatalog, request, restOperations, parserService);
     }
     
 }
