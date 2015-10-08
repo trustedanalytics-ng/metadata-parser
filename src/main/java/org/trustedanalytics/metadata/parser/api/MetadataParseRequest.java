@@ -22,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trustedanalytics.metadata.parser.ParseTaskFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class MetadataParseRequest {
 
    
@@ -118,6 +120,7 @@ public class MetadataParseRequest {
         LOGGER.info(toString());
     }
     
+    @JsonIgnore
     public boolean isFullHdfsPath() {
         return source.toString().contains(HDFS_FULL_PATH_INDICATOR);
     }

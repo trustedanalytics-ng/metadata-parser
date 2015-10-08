@@ -76,6 +76,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.junit.Ignore;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Main.class, MetadataParserIT.TestConfig.class})
@@ -136,6 +137,7 @@ public class MetadataParserIT {
     }
 
     @Test
+    @Ignore
     public void parseMetadata_existingDataset()
         throws URISyntaxException, InterruptedException, ExecutionException, TimeoutException,
         IOException, ServletException {
@@ -149,7 +151,7 @@ public class MetadataParserIT {
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
         request.setOrgUUID(TEST_ORG_UUID);
 
-        assertThat(postRequest(request).getStatusCode(), equalTo(HttpStatus.ACCEPTED));
+        assertThat(postRequest(request,"/rest/datasets").getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(putMetadata.get(500, TimeUnit.MILLISECONDS), equalTo(metadata()));
 
         verify(callback, timeout(500))
@@ -188,6 +190,7 @@ public class MetadataParserIT {
         request.setIdInObjectStore("not_existing_id");
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
         request.setOrgUUID(TEST_ORG_UUID);
+        request.setSource(new URI(source));
 
 
         assertThat(postRequest(request).getStatusCode(), equalTo(HttpStatus.ACCEPTED));
@@ -217,6 +220,12 @@ public class MetadataParserIT {
             HttpHeaders.AUTHORIZATION, "bearer " + TOKEN)));
 
         return testRestTemplate.postForEntity(baseUrl + "/rest/metadata", request, String.class);
+    }
+    private ResponseEntity<String> postRequest(MetadataParseRequest request, String endpoint) {
+        testRestTemplate.setInterceptors(Collections.singletonList(new HeaderAddingHttpInterceptor(
+            HttpHeaders.AUTHORIZATION, "bearer " + TOKEN)));
+
+        return testRestTemplate.postForEntity(baseUrl + endpoint, request, String.class);
     }
 
     private MetadataParseStatus eqState(MetadataParseStatus.State state) {
@@ -296,8 +305,9 @@ public class MetadataParserIT {
         @Autowired
         private CompletableFuture<Metadata> putMetadata;
 
-        @RequestMapping(value = "/rest/datasets/{id}", method = RequestMethod.PUT)
+        @RequestMapping(value = "/rest/datasets", method = RequestMethod.POST)
         public void putMetadata(@RequestBody Metadata metadata) {
+            System.out.println("Complete :" + metadata);
             putMetadata.complete(metadata);
         }
     }
