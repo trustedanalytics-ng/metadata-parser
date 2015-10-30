@@ -18,38 +18,23 @@ package org.trustedanalytics.metadata.parser.api;
 import java.net.URI;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.trustedanalytics.metadata.parser.ParseTaskFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import lombok.Data;
+
+@Data
 public class MetadataParseRequest {
 
-    @Getter @Setter
     private String id;
-
-    @Getter @Setter
     private String  source;
-
-    @Getter @Setter
     private String idInObjectStore;
-
-    @Getter @Setter
     private URI callbackUrl;
-
-    @Getter @Setter
     private String title;
-
-    @Getter @Setter
     private String category;
-
-    @Getter @Setter
     private UUID orgUUID;
-
-    @Getter @Setter
     private boolean publicRequest;
 
     @Override

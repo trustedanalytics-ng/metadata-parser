@@ -21,31 +21,77 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.apache.commons.io.IOUtils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
 public class ParseServiceTest {
 
     private static final UUID TEST_ORG_UUID = UUID.fromString("09b11c7b-47f7-464f-b146-93b286bce677");
+    
+    private static String readFile(String fileName, String encoding) throws IOException {        
+        InputStream in = ParseServiceTest.class.getClassLoader().getResourceAsStream(fileName);
+        return IOUtils.toString(in, "UTF-8");
+    }
+    
+    private static String readFileLines(String fileName, String encoding, int lines) throws IOException {
+        
+        InputStream in = ParseServiceTest.class.getClassLoader().getResourceAsStream(fileName);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in,encoding));
+        
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0;i < lines; ++i) {
+            builder.append(reader.readLine());
+            builder.append("\n");
+        }
+        in.close();
+        reader.close();
+        return builder.toString();
+    }
+    
+    private static String readFileBytes(String fileName, String encoding, int bytes) throws IOException {
+        InputStream in = ParseServiceTest.class.getClassLoader().getResourceAsStream(fileName);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in,encoding));
+        char [] buffer = new char[bytes];
+        reader.read(buffer);
+        reader.close();
+        in.close();
+        return String.valueOf(buffer);
+    }
 
-    @Parameters(name = "{index}: getMetadata({0})=({1},{2})")
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows.csv?accessType=DOWNLOAD", 1, "CSV", "header"},
-                {"http://test.com/test.XML", 0, "XML", "header\nrow1\nrow2"},
-                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 1, "CSV", "header"},
-                {"file (1).csv", 1, "CSV", "header"}
+    @Parameters(name = "{index}: getMetadata({0})=({1},{2},{3})")
+    public static Collection<Object[]> data() throws IOException {
+        return Arrays.asList(new Object[][]{ 
+                {"file (1).csv", 0, "CSV", "header", "header"},
+                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows.csv?accessType=DOWNLOAD", 2, "CSV","header\nrow1\nrow2\n", "header\nrow1\n"},
+                {"http://test.com/compressed.tar.gz", 0, "XML", "<?xml version=\"1.0\" encoding=\"UTF-8\">\n<tag>\n</tag>", "<?xml version=\"1.0\" encoding=\"UTF-8\">\n<tag>\n</tag>"},
+                {"http://test.com/test.CSV", 2, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n","header1,header2,header3\nval1,val2,val3\n"},
+                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 2, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n", "header1,header2,header3\nval1,val2,val3\n"},
+                {"https://data.consumerfinance.gov/index.html", 0, "HTML", "<HTML><HEAD><HEAD><BODY></BODY></HTML>","<HTML><HEAD><HEAD><BODY></BODY></HTML>"},
+                {"https://data.consumerfinance.gov", 0, "HTML", "<HTML><HEAD><HEAD><BODY></BODY></HTML>","<HTML><HEAD><HEAD><BODY></BODY></HTML>"},
+                {"https://data.consumerfinance.gov", 0, "JSON", "{ \"record\" : { \"val\":1, \"name\": \"John Doe\"}}","{ \"record\" : { \"val\":1, \"name\": \"John Doe\"}}"},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample.json", "UTF-8"), readFile("sample.json", "UTF-8")},
+                {"https://data.consumerfinance.gov", 0, "XML", readFile("sample.xml", "UTF-8"), readFile("sample.xml", "UTF-8")},
+                {"https://data.consumerfinance.gov", 4, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 2)},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("large.json", "UTF-8"), readFileBytes("large.json", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 1000, "CSV", readFile("large.csv", "UTF-8"), readFileLines("large.csv", "UTF-8", 2)},
+                {"https://data.consumerfinance.gov/file.xml", 0, "XML", readFile("large.csv", "UTF-8"), readFileBytes("large.csv", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://not_supported_file_extension.org/test.AVR", 0, "AVR", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://wp.pl", 0, "HTML", readFile("sample_html.txt", "UTF-8"), readFileBytes("sample_html.txt", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 4, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 2)}
         });
     }
 
@@ -57,11 +103,11 @@ public class ParseServiceTest {
     private final String header;
     private final int size;
     
-    public ParseServiceTest(String sourceUri, long recordCount, String type, String header) {
+    public ParseServiceTest(String sourceUri, long recordCount, String type, String content, String header) {
         this.sourceUri = sourceUri;
         this.recordCount = recordCount;
         this.type = type;
-        this.content = "header\nrow1\nrow2";
+        this.content = content; 
         this.targetUri = "teststore/inobjectstore";
         this.header = header;
         this.size = content.length();
@@ -103,4 +149,5 @@ public class ParseServiceTest {
         
         return metadata;
     }
+    
 }

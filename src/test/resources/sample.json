@@ -1,0 +1,9 @@
+{
+         "metadata": {
+            "updated_at": "2015-08-31T09:43:23Z"
+         },
+         "entity": {
+            "production": false,
+            "enable_ssh": true,
+         }
+      }

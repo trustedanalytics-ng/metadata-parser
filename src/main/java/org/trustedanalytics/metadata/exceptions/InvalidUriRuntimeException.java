@@ -19,6 +19,11 @@ package org.trustedanalytics.metadata.exceptions;
 import java.net.URISyntaxException;
 
 public class InvalidUriRuntimeException extends RuntimeException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7780048200777670984L;
+
     public  InvalidUriRuntimeException(URISyntaxException e) {
         super(e);
     }

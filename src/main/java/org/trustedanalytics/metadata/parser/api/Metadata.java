@@ -17,31 +17,30 @@ package org.trustedanalytics.metadata.parser.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import java.util.Objects;
+import java.io.IOException;
 import java.util.UUID;
 
-import static com.google.common.base.MoreObjects.toStringHelper;
-
 /**
- * Metadata representation.
- * This object is passed to Data Catalog.
- * It needs to be serialized in a strict way to be readable by the Data Catalog.
+ * Metadata representation. This object is passed to Data Catalog. It needs to
+ * be serialized in a strict way to be readable by the Data Catalog.
  */
+@Data
 public class Metadata {
 
-    @Getter @Setter private String dataSample;
-    @Getter @Setter private long size;
-    @Getter @Setter private String sourceUri;
-    @Getter @Setter private String targetUri;
-    @Getter @Setter private String format;
-    @Getter @Setter private long recordCount;
-    @Getter @Setter private String title;
-    @Getter @Setter private String category;
-    @Getter @Setter private UUID orgUUID;
-    @JsonProperty("isPublic") private boolean isPublic;
+    private String dataSample;
+    private long size;
+    private String sourceUri;
+    private String targetUri;
+    private String format;
+    private long recordCount;
+    private String title;    
+    private String category;    
+    private UUID orgUUID;
+    
+    @JsonProperty("isPublic")
+    private boolean isPublic;
 
     @JsonIgnore
     public boolean getPublic() {
@@ -52,46 +51,27 @@ public class Metadata {
     public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
     }
-
-    @Override
-    public String toString() {
-        return toStringHelper(this)
-            .add("dataSample", dataSample)
-            .add("size", size)
-            .add("sourceUri", sourceUri)
-            .add("targetUri", targetUri)
-            .add("format", format)
-            .add("recordCount", recordCount)
-            .add("title", title)
-            .add("category", category)
-            .add("orgUUID", orgUUID)
-            .add("isPublic", isPublic)
-            .toString();
+    
+    public Metadata() {
+        
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(dataSample, size, sourceUri, targetUri, format, recordCount, title, category, orgUUID);
+    public Metadata(MetadataParseRequest request, String storeId)
+            throws IOException {
+        targetUri = buildTargetUri(storeId, request.getIdInObjectStore());
+        title = request.getTitle();
+        category = request.getCategory();
+        orgUUID = request.getOrgUUID();
+        isPublic = request.isPublicRequest();
+        sourceUri = request.getSource().toString();
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+    
+    private static String buildTargetUri(String storeId,
+            String idInObjectStore) {
+        if (storeId.endsWith("/")) {
+            return storeId + idInObjectStore;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Metadata other = (Metadata) obj;
-        return Objects.equals(this.dataSample, other.dataSample)
-            && Objects.equals(this.size, other.size)
-            && Objects.equals(this.sourceUri, other.sourceUri)
-            && Objects.equals(this.targetUri, other.targetUri)
-            && Objects.equals(this.format, other.format)
-            && Objects.equals(this.recordCount, other.recordCount)
-            && Objects.equals(this.title, other.title)
-            && Objects.equals(this.category, other.category)
-            && Objects.equals(this.orgUUID, other.orgUUID)
-            && Objects.equals(this.isPublic, other.isPublic);
+        return storeId + "/" + idInObjectStore;
     }
+
 }
