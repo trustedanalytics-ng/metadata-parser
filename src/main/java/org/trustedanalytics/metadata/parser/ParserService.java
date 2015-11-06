@@ -49,7 +49,7 @@ public class ParserService {
     public Metadata parse(MetadataParseRequest request, String storeId, InputStream in) {
         Metadata metadata = new Metadata();
         
-        metadata.setSourceUri(request.getSource().toString());
+        metadata.setSourceUri(request.getSource());
         //TODO: why do not use MIME types here, i.e. text/csv ?
         metadata.setFormat(fetchType(metadata.getSourceUri()));
         metadata.setTargetUri(findTargetUri(storeId, request.getIdInObjectStore()));
@@ -118,7 +118,8 @@ public class ParserService {
         try {
             filename = new URI(uriStr).getPath();
         } catch (URISyntaxException e) {
-            throw new InvalidUriRuntimeException(e);
+            // assuming that this is plain filename, not URI
+            filename = uriStr;
         }
 
         if(filename.lastIndexOf('.') > filename.lastIndexOf('/'))

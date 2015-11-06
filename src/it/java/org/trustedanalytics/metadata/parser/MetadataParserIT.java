@@ -147,7 +147,7 @@ public class MetadataParserIT {
         request.setTitle("title");
         request.setId("1234");
         request.setIdInObjectStore(idInStore);
-        request.setSource(new URI(source));
+        request.setSource(source);
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
         request.setOrgUUID(TEST_ORG_UUID);
 
@@ -169,7 +169,7 @@ public class MetadataParserIT {
         request.setTitle("title");
         request.setId("1234");
         request.setIdInObjectStore(idInStore);
-        request.setSource(new URI(source));
+        request.setSource(source);
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
         request.setOrgUUID(TEST_ORG_UUID);
         request.setPublicRequest(false);
@@ -190,7 +190,7 @@ public class MetadataParserIT {
         request.setIdInObjectStore("not_existing_id");
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
         request.setOrgUUID(TEST_ORG_UUID);
-        request.setSource(new URI(source));
+        request.setSource(source);
 
 
         assertThat(postRequest(request).getStatusCode(), equalTo(HttpStatus.ACCEPTED));

@@ -18,6 +18,8 @@ package org.trustedanalytics.metadata.parser.api;
 import java.net.URI;
 import java.util.UUID;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trustedanalytics.metadata.parser.ParseTaskFactory;
@@ -26,79 +28,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class MetadataParseRequest {
 
-   
+    @Getter @Setter
     private String id;
-    private URI source;
+
+    @Getter @Setter
+    private String  source;
+
+    @Getter @Setter
     private String idInObjectStore;
+
+    @Getter @Setter
     private URI callbackUrl;
+
+    @Getter @Setter
     private String title;
+
+    @Getter @Setter
     private String category;
+
+    @Getter @Setter
     private UUID orgUUID;
+
+    @Getter @Setter
     private boolean publicRequest;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public URI getSource() {
-        return source;
-    }
-
-    public void setSource(URI source) {
-        this.source = source;
-    }
-
-    public String getIdInObjectStore() {
-        return idInObjectStore;
-    }
-
-    public void setIdInObjectStore(String idInObjectStore) {
-        this.idInObjectStore = idInObjectStore;
-    }
-
-    public URI getCallbackUrl() {
-        return callbackUrl;
-    }
-
-    public void setCallbackUrl(URI callbackUrl) {
-        this.callbackUrl = callbackUrl;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public UUID getOrgUUID() {
-        return orgUUID;
-    }
-
-    public void setOrgUUID(UUID orgUUID) {
-        this.orgUUID = orgUUID;
-    }
-
-    public boolean isPublicRequest() {
-        return publicRequest;
-    }
-
-    public void setPublicRequest(boolean publicRequest) {
-        this.publicRequest = publicRequest;
-    }
 
     @Override
     public String toString() {

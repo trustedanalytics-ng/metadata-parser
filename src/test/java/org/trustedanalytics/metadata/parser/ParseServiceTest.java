@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
@@ -43,7 +44,8 @@ public class ParseServiceTest {
         return Arrays.asList(new Object[][]{
                 {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows.csv?accessType=DOWNLOAD", 1, "CSV", "header"},
                 {"http://test.com/test.XML", 0, "XML", "header\nrow1\nrow2"},
-                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 1, "CSV", "header"}
+                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 1, "CSV", "header"},
+                {"file (1).csv", 1, "CSV", "header"}
         });
     }
 
@@ -69,7 +71,7 @@ public class ParseServiceTest {
     public void getMetadata() throws URISyntaxException, IOException {
         MetadataParseRequest request = new MetadataParseRequest();
         request.setIdInObjectStore("inobjectstore");
-        request.setSource(new URI(sourceUri));
+        request.setSource(sourceUri);
         request.setOrgUUID(TEST_ORG_UUID);
 
         Metadata metadata = new ParserService().parse(request, "teststore/", new ByteArrayInputStream(content.getBytes()));
@@ -81,7 +83,7 @@ public class ParseServiceTest {
     public void getMetadata_noSlash() throws URISyntaxException, IOException {
         MetadataParseRequest request = new MetadataParseRequest();
         request.setIdInObjectStore("inobjectstore");
-        request.setSource(new URI(sourceUri));
+        request.setSource(sourceUri);
         request.setOrgUUID(TEST_ORG_UUID);
 
         Metadata metadata = new ParserService().parse(request, "teststore", new ByteArrayInputStream(content.getBytes()));
@@ -89,7 +91,6 @@ public class ParseServiceTest {
         assertThat(metadata, equalTo(metadata()));
     }
 
-    
     private Metadata metadata() {
         Metadata metadata = new Metadata();
         metadata.setSourceUri(sourceUri);
