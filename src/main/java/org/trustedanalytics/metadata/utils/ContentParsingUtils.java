@@ -35,23 +35,24 @@ public class ContentParsingUtils {
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
             String headerRow = reader.readLine();
-            String secondRow = reader.readLine();
 
-            String sample = headerRow;
-            if (secondRow != null) {
-                sample += "\n" + secondRow + "\n";
-                recordCount++;
-            }
+            String sample = headerRow + "\n";
 
             metadata.setDataSample(sample);
             if (metadata.getDataSample() != null) {
                 size += metadata.getDataSample().length();
             }
+
             while ((loaded = reader.read(buffer)) != -1) {
                 size += loaded;
                 recordCount += ContentParsingUtils.findOccurrences(buffer,
                         ParserService.RECORD_SEPARATOR, loaded);
             }
+
+            if (size == headerRow.length() + 1) {
+                size--; // decrement the size if only header row exists in dataset (no newline)
+            }
+
         } catch (IOException e) {
             Throwables.propagate(e);
         }
