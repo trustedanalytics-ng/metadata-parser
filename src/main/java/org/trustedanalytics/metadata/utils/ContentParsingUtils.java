@@ -36,7 +36,7 @@ public class ContentParsingUtils {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
             String headerRow = reader.readLine();
 
-            String sample = headerRow + "\n";
+            String sample = headerRow;
 
             metadata.setDataSample(sample);
             if (metadata.getDataSample() != null) {
@@ -49,8 +49,8 @@ public class ContentParsingUtils {
                         ParserService.RECORD_SEPARATOR, loaded);
             }
 
-            if (size == headerRow.length() + 1) {
-                size--; // decrement the size if only header row exists in dataset (no newline)
+            if (size > headerRow.length()) {
+                size++; // include newline between header row and rest of the rows
             }
 
         } catch (IOException e) {
