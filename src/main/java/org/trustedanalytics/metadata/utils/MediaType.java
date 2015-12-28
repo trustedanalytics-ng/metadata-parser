@@ -21,7 +21,7 @@ public enum MediaType {
     
     XML("application/xml", new String [] {"XML"}, "XML"),
     HTML("text/html", new String [] {"HTML", "HTM"}, "HTML"),
-    CSV("text/csv", new String [] {"CSV"}, "CSV") ,
+    CSV("text/csv", new String [] {"CSV", "DATA"}, "CSV") ,
     JSON("application/json", new String [] {"JSON"}, "JSON");
     
     final String value;
