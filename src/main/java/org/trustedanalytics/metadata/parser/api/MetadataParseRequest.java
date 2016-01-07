@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import org.trustedanalytics.metadata.parser.HdfsRequestException;
 
 @Data
 public class MetadataParseRequest {
@@ -37,21 +38,21 @@ public class MetadataParseRequest {
     private UUID orgUUID;
     private boolean publicRequest;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataParseRequest.class);
+
+    private static final CharSequence HDFS_FULL_PATH_INDICATOR = "hdfs://";
+
     @Override
     public String toString() {
         return "MetadataParseRequest [id=" + id + ", source=" + source + ", idInObjectStore="
                 + idInObjectStore + ", callbackUrl=" + callbackUrl + ", title=" + title
                 + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
     }
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataParseRequest.class);
-    
-    private static final CharSequence HDFS_FULL_PATH_INDICATOR = "hdfs://";
-    
-    public void adjustHdfsRequest(String objectStoreId) throws Exception {    
+
+    public void adjustHdfsRequest(String objectStoreId) throws HdfsRequestException {
         int objectStorePartIdx = source.toString().indexOf(objectStoreId);
         if (objectStorePartIdx == -1) {
-            throw (new Exception("Hdfs path "+ source +" is outside current object store: " + objectStoreId));
+            throw new HdfsRequestException("Hdfs path "+ source +" is outside current object store: " + objectStoreId);
         }               
         this.idInObjectStore = source.toString().substring(objectStorePartIdx + objectStoreId.length());
         LOGGER.info(toString());

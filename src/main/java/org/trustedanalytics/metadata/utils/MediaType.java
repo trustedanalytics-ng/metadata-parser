@@ -25,20 +25,22 @@ public enum MediaType {
     JSON("application/json", new String [] {"JSON"}, "JSON");
     
     final String value;
-    final String extensions[];
+    final String[] extensions;
     final String humanFriendlyFormat;
     
-    MediaType(String value, String extensions[], String humanFriendlyFormat) {
+    MediaType(String value, String[] extensions, String humanFriendlyFormat) {
         this.value = value;
         this.extensions = extensions;
         this.humanFriendlyFormat = humanFriendlyFormat;
     }
-    
+    @Override
     public String toString() {
         return value;
     }
 
-    public String getHumanFriendlyFormat() { return humanFriendlyFormat; }
+    public String getHumanFriendlyFormat() {
+        return humanFriendlyFormat;
+    }
     
     public static Optional<MediaType> fromExtension(String x) {
         for (MediaType val : MediaType.values()) {

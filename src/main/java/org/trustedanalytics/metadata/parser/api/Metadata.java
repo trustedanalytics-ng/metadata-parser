@@ -38,22 +38,12 @@ public class Metadata {
     private String title;    
     private String category;    
     private UUID orgUUID;
-    
+
     @JsonProperty("isPublic")
     private boolean isPublic;
 
-    @JsonIgnore
-    public boolean getPublic() {
-        return isPublic;
-    }
-
-    @JsonIgnore
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
-    }
-    
     public Metadata() {
-        
+
     }
 
     public Metadata(MetadataParseRequest request, String storeId)
@@ -65,7 +55,17 @@ public class Metadata {
         isPublic = request.isPublicRequest();
         sourceUri = request.getSource().toString();
     }
-    
+
+    @JsonIgnore
+    public boolean getPublic() {
+        return isPublic;
+    }
+
+    @JsonIgnore
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     private static String buildTargetUri(String storeId,
             String idInObjectStore) {
         if (storeId.endsWith("/")) {

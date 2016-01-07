@@ -20,19 +20,20 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class ContentDetectionUtils {
-    
+
+    public static final int MAX_BYTES_READ_WHILE_PROBING_TYPE = 2048;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentDetectionUtils.class);
+
     public static String bestGuessFileType(BufferedInputStream bin, String fileUri) throws IOException {
         
         Optional<MediaType> detectedType = Optional.empty();
@@ -69,11 +70,7 @@ public class ContentDetectionUtils {
     private static boolean isMeaningfulExtension(String extension) { 
         return extension != null && !ImmutableList.of("GZ","ZIP").contains(extension);
     }
-    
-    public static final int MAX_BYTES_READ_WHILE_PROBING_TYPE = 2048;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContentDetectionUtils.class);
 
-  
     private static boolean canBeJson(String buffer) {
         LOGGER.info("Counting {} brackets");                
         Integer[] counted =  countBrackets("{}", buffer);
@@ -119,10 +116,10 @@ public class ContentDetectionUtils {
          */
         int paired = (opening > closing ? closing : opening) * 2;
        
-        int total_count = opening + closing;
+        int totalCount = opening + closing;
         
-        LOGGER.info("Total count = {},  paired = {}", total_count, paired);
-        return new Integer[]{total_count, paired};
+        LOGGER.info("Total count = {},  paired = {}", totalCount, paired);
+        return new Integer[]{totalCount, paired};
         
     }
     
@@ -147,7 +144,7 @@ public class ContentDetectionUtils {
                 type = MediaType.fromString(guess);
             }
         } catch (IOException e){
-            LOGGER.error("Error while guessing stream type");
+            LOGGER.error("Error while guessing stream type",e);
         }         
         bin.reset();
         bin.mark(0);
@@ -160,10 +157,12 @@ public class ContentDetectionUtils {
         in.mark(MAX_BYTES_READ_WHILE_PROBING_TYPE);
         try {
             in.read(bytes, 0, MAX_BYTES_READ_WHILE_PROBING_TYPE);
-            if (canBeJson(new String(bytes))) ret = true;
+            if (canBeJson(new String(bytes))){
+                ret = true;
+            }
             in.reset();
         } catch (IOException e) {
-            LOGGER.error("Error while guessing stream type");
+            LOGGER.error("Error while guessing stream type",e);
         }
         in.mark(0);
         return ret;
@@ -175,6 +174,7 @@ public class ContentDetectionUtils {
             filename = new URI(uriStr).getPath();   
         } catch (URISyntaxException e) {
             // assuming this is plain filename, not URI
+            LOGGER.info("Assigning plain filename instead of URI",e);
             filename = uriStr;
         }
         

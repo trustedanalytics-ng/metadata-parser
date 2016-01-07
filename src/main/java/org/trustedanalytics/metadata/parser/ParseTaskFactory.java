@@ -39,7 +39,7 @@ public class ParseTaskFactory {
         this.parserService = parserService;
     }
 
-    public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog, RestOperations restOperations) throws Exception {
+    public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog, RestOperations restOperations) throws HdfsRequestException {
         
         if (request.isFullHdfsPath()) {
             LOGGER.info("Adjusting hdfs request");
