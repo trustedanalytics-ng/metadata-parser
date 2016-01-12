@@ -1,9 +1,9 @@
 ---
 applications:
-- name: metadataparser 
+- name: metadataparser
   memory: 512M
   instances: 1
-  host: metadata 
+  host: metadata
   path: target/metadata-parser-${version}.jar
   services:
     - datacatalog
@@ -12,5 +12,6 @@ applications:
     - sso
     - kerberos-service
   env:
+    SPRING_PROFILES_ACTIVE: "multitenant-hdfs"
     VERSION: ${version}
     JBP_CONFIG_OPEN_JDK_JRE: '[memory_sizes: {metaspace: 128m..}]'

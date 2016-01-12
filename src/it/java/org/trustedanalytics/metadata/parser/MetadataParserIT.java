@@ -67,6 +67,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -95,7 +96,7 @@ public class MetadataParserIT {
     @Autowired
     private String TOKEN;
     @Autowired
-    private ObjectStore objectStore;
+    private Function<UUID, ObjectStore> objectStoreFactory;
     @Autowired
     private MetadataParserCallback callback;
     @Autowired
@@ -127,7 +128,7 @@ public class MetadataParserIT {
         content = "testheader\ntestrow";
 
         when(tokenRetriever.getAuthToken(any(Authentication.class))).thenReturn(TOKEN);
-        idInStore = objectStore.save(content.getBytes());
+        idInStore = objectStoreFactory.apply(null).save(content.getBytes());
         testRestTemplate = new TestRestTemplate();
         request = new MetadataParseRequest();
     }
@@ -237,8 +238,8 @@ public class MetadataParserIT {
     public static class TestConfig {
 
         @Bean
-        public ObjectStore objectStore() {
-            return new MemoryObjectStore();
+        public Function<UUID, ObjectStore> objectStoreFactory() {
+            return (x) -> new MemoryObjectStore();
         }
 
         @Bean

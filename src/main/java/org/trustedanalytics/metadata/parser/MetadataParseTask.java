@@ -15,29 +15,29 @@
  */
 package org.trustedanalytics.metadata.parser;
 
-import java.io.InputStream;
-
 import org.trustedanalytics.metadata.datacatalog.DataCatalog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestOperations;
-
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
 import org.trustedanalytics.metadata.parser.api.MetadataParseStatus;
 import org.trustedanalytics.store.ObjectStore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestOperations;
+
+import java.io.InputStream;
+
 //FIXME: There's something wrong about this class - to many dependencies, to little logic
 public class MetadataParseTask implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataParseTask.class);
-    
+
     private final ObjectStore objectStore;
     private final MetadataParseRequest request;
     private final DataCatalog dataCatalog;
     private final RestOperations restTemplate;
     private final ParserService parserService;
-    
+
     public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService) {
         this.objectStore = objectStore;
         this.request = metadataDescriptor;
@@ -60,7 +60,7 @@ public class MetadataParseTask implements Runnable {
     private void notifyDone() {
         restTemplate.postForEntity(request.getCallbackUrl(), MetadataParseStatus.done(), String.class);
     }
-    
+
     private void notifyFailed(String msg, Exception e) {
         LOG.error(msg, e);
         restTemplate.postForEntity(request.getCallbackUrl(), MetadataParseStatus.failed(), String.class);

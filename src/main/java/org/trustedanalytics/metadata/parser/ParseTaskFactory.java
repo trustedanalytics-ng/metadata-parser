@@ -16,38 +16,44 @@
 package org.trustedanalytics.metadata.parser;
 
 import org.trustedanalytics.metadata.datacatalog.DataCatalog;
+import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
+import org.trustedanalytics.store.ObjectStore;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
 
-import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
-import org.trustedanalytics.store.ObjectStore;
+import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class ParseTaskFactory {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ParseTaskFactory.class);
 
-    private final ObjectStore objectStore;
+    private final Function<UUID, ObjectStore> objectStoreFactory;
     private final ParserService parserService;
-    
+
     @Autowired
-    public ParseTaskFactory(ObjectStore objectStore, ParserService parserService) {
-        this.objectStore = objectStore;
+    public ParseTaskFactory(Function<UUID, ObjectStore> objectStoreFactory, ParserService parserService) {
+        this.objectStoreFactory = objectStoreFactory;
         this.parserService = parserService;
     }
 
-    public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog, RestOperations restOperations) throws HdfsRequestException {
-        
+    public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog,
+        RestOperations restOperations) throws HdfsRequestException {
+
+        ObjectStore objectStore = objectStoreFactory.apply(request.getOrgUUID());
+
         if (request.isFullHdfsPath()) {
             LOGGER.info("Adjusting hdfs request");
             request.adjustHdfsRequest(objectStore.getId());
         }
-        
+
         LOGGER.info("Creating task for request: " + request.toString());
         return new MetadataParseTask(objectStore, dataCatalog, request, restOperations, parserService);
     }
-    
+
 }
