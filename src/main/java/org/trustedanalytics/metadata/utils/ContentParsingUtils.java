@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import org.trustedanalytics.metadata.exceptions.InputStreamParseException;
 import org.trustedanalytics.metadata.parser.ParserService;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 
@@ -35,13 +37,13 @@ public class ContentParsingUtils {
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
             String headerRow = reader.readLine();
+            if (headerRow == null) {
+                throw new InputStreamParseException("Error parsing input stream: the file is empty");
+            }
 
             String sample = headerRow;
-
             metadata.setDataSample(sample);
-            if (metadata.getDataSample() != null) {
-                size += metadata.getDataSample().length();
-            }
+            size += metadata.getDataSample().length();
 
             while ((loaded = reader.read(buffer)) != -1) {
                 size += loaded;
@@ -53,7 +55,7 @@ public class ContentParsingUtils {
                 size++; // include newline between header row and rest of the rows
             }
 
-        } catch (IOException e) {
+        } catch (IOException|InputStreamParseException e) {
             Throwables.propagate(e);
         }
 

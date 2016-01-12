@@ -51,9 +51,9 @@ public class UserOrgAccessFilter extends OncePerRequestFilter {
         try {
             orgId = OrgGuidRetriever.getOrgGuidFromRequestBody(request.getBody());
             LOG.debug(String.format("Org user want to access: '%s'", orgId));
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             LOG.debug(e.getMessage(), e);
-            httpServletResponse.sendError(404, e.getMessage());
+            httpServletResponse.sendError(404, "Org GUID could not be retreived from request body.");
             return;
         }
 

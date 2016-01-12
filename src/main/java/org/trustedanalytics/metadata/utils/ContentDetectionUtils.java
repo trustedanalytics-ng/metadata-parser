@@ -72,7 +72,7 @@ public class ContentDetectionUtils {
     }
 
     private static boolean canBeJson(String buffer) {
-        LOGGER.info("Counting {} brackets");                
+        LOGGER.info("Counting {} brackets");
         Integer[] counted =  countBrackets("{}", buffer);
         return passingJsonCriteria(counted);
     }
@@ -156,8 +156,8 @@ public class ContentDetectionUtils {
         boolean ret = false;
         in.mark(MAX_BYTES_READ_WHILE_PROBING_TYPE);
         try {
-            in.read(bytes, 0, MAX_BYTES_READ_WHILE_PROBING_TYPE);
-            if (canBeJson(new String(bytes))){
+            int bytesRead = in.read(bytes, 0, MAX_BYTES_READ_WHILE_PROBING_TYPE);
+            if (bytesRead > 0 && canBeJson(new String(bytes))){
                 ret = true;
             }
             in.reset();

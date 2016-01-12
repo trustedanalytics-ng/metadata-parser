@@ -40,8 +40,7 @@ public class OrgGuidRetriever {
                 mapper.readValue(body, MetadataParseRequest.class);
             return request.getOrgUUID();
         } catch (IOException e) {
-            LOG.debug(e.getMessage(), e);
-            throw new InvalidParameterException("Cannot parse request body");
+            throw new IllegalArgumentException("Cannot parse request body", e);
         }
     }
 }

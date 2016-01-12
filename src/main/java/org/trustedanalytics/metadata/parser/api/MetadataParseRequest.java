@@ -50,16 +50,16 @@ public class MetadataParseRequest {
     }
 
     public void adjustHdfsRequest(String objectStoreId) throws HdfsRequestException {
-        int objectStorePartIdx = source.toString().indexOf(objectStoreId);
+        int objectStorePartIdx = source.indexOf(objectStoreId);
         if (objectStorePartIdx == -1) {
             throw new HdfsRequestException("Hdfs path "+ source +" is outside current object store: " + objectStoreId);
         }               
-        this.idInObjectStore = source.toString().substring(objectStorePartIdx + objectStoreId.length());
+        this.idInObjectStore = source.substring(objectStorePartIdx + objectStoreId.length());
         LOGGER.info(toString());
     }
     
     @JsonIgnore
     public boolean isFullHdfsPath() {
-        return source.toString().contains(HDFS_FULL_PATH_INDICATOR);
+        return source.contains(HDFS_FULL_PATH_INDICATOR);
     }
 }
