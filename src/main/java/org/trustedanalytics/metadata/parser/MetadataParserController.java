@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 @RestController
@@ -55,7 +57,8 @@ public class MetadataParserController {
 
   @RequestMapping(method = POST)
   @ResponseStatus(ACCEPTED)
-  public void extractMetadata(@RequestBody MetadataParseRequest request) throws HdfsRequestException {
+  public void extractMetadata(@RequestBody MetadataParseRequest request)
+      throws HdfsRequestException, IOException, LoginException, InterruptedException {
     // Extracting of authentication needs to happen on thread that has access to request scope
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     final RestOperations restOperations = restOperationsFactory.oAuth(authentication);

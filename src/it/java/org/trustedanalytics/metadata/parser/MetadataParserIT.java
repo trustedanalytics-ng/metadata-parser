@@ -54,8 +54,9 @@ import org.trustedanalytics.metadata.parser.api.MetadataParseStatus;
 import org.trustedanalytics.metadata.parser.api.MetadataParserCallback;
 import org.trustedanalytics.metadata.security.authorization.Authorization;
 import org.trustedanalytics.store.MemoryObjectStore;
-import org.trustedanalytics.store.ObjectStore;
+import org.trustedanalytics.store.ObjectStoreFactory;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -67,7 +68,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -96,7 +96,7 @@ public class MetadataParserIT {
     @Autowired
     private String TOKEN;
     @Autowired
-    private Function<UUID, ObjectStore> objectStoreFactory;
+    private ObjectStoreFactory<UUID> objectStoreFactory;
     @Autowired
     private MetadataParserCallback callback;
     @Autowired
@@ -120,7 +120,7 @@ public class MetadataParserIT {
         UUID.fromString("f02e100b-8390-463a-8165-180ea4dd88ee");
 
     @Before
-    public void before() throws IOException {
+    public void before() throws IOException, LoginException, InterruptedException {
 
         dataCatalogFactory.setDataCatalogUrl(dataCatalogUrl);
 
@@ -128,7 +128,7 @@ public class MetadataParserIT {
         content = "testheader\ntestrow";
 
         when(tokenRetriever.getAuthToken(any(Authentication.class))).thenReturn(TOKEN);
-        idInStore = objectStoreFactory.apply(null).save(content.getBytes());
+        idInStore = objectStoreFactory.create(null).save(content.getBytes());
         testRestTemplate = new TestRestTemplate();
         request = new MetadataParseRequest();
     }
@@ -238,7 +238,7 @@ public class MetadataParserIT {
     public static class TestConfig {
 
         @Bean
-        public Function<UUID, ObjectStore> objectStoreFactory() {
+        public ObjectStoreFactory<UUID> objectStoreFactory() {
             return (x) -> new MemoryObjectStore();
         }
 
