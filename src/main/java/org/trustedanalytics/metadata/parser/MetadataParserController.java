@@ -35,6 +35,8 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/rest/metadata")
 public class MetadataParserController {
@@ -55,6 +57,7 @@ public class MetadataParserController {
     this.restOperationsFactory = restOperationsFactory;
   }
 
+  @ApiOperation("Extracting basic information about dataset and adding it to datacatalog")
   @RequestMapping(method = POST)
   @ResponseStatus(ACCEPTED)
   public void extractMetadata(@RequestBody MetadataParseRequest request)
