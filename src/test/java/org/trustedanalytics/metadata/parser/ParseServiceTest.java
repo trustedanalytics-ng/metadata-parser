@@ -15,13 +15,17 @@
  */
 package org.trustedanalytics.metadata.parser;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
+
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -32,9 +36,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
 public class ParseServiceTest {
@@ -74,24 +75,26 @@ public class ParseServiceTest {
     @Parameters(name = "{index}: getMetadata({0})=({1},{2},{3})")
     public static Collection<Object[]> data() throws IOException {
         return Arrays.asList(new Object[][]{ 
-                {"file (1).csv", 0, "CSV", "header", "header"},
-                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows.csv?accessType=DOWNLOAD", 2, "CSV","header\nrow1\nrow2\n", "header"},
+                {"file (1).csv", 1, "CSV", "header", "header"},
+                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows.csv?accessType=DOWNLOAD", 3, "CSV","header\nrow1\nrow2\n", "header"},
                 {"http://test.com/compressed.tar.gz", 0, "XML", "<?xml version=\"1.0\" encoding=\"UTF-8\">\n<tag>\n</tag>", "<?xml version=\"1.0\" encoding=\"UTF-8\">\n<tag>\n</tag>"},
-                {"http://test.com/test.CSV", 2, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n","header1,header2,header3"},
-                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 2, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n", "header1,header2,header3"},
+                {"http://test.com/test.CSV", 3, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n","header1,header2,header3"},
+                {"https://data.consumerfinance.gov/api/views/x94z-ydhh/rows?accessType=DOWNLOAD", 3, "CSV", "header1,header2,header3\nval1,val2,val3\nval4,val5,val6\n", "header1,header2,header3"},
                 {"https://data.consumerfinance.gov/index.html", 0, "HTML", "<HTML><HEAD><HEAD><BODY></BODY></HTML>","<HTML><HEAD><HEAD><BODY></BODY></HTML>"},
                 {"https://data.consumerfinance.gov", 0, "HTML", "<HTML><HEAD><HEAD><BODY></BODY></HTML>","<HTML><HEAD><HEAD><BODY></BODY></HTML>"},
                 {"https://data.consumerfinance.gov", 0, "JSON", "{ \"record\" : { \"val\":1, \"name\": \"John Doe\"}}","{ \"record\" : { \"val\":1, \"name\": \"John Doe\"}}"},
                 {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample.json", "UTF-8"), readFile("sample.json", "UTF-8")},
                 {"https://data.consumerfinance.gov", 0, "XML", readFile("sample.xml", "UTF-8"), readFile("sample.xml", "UTF-8")},
-                {"https://data.consumerfinance.gov", 4, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
-                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 5, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8", ParserService.HEADER_LENGTH)},
                 {"https://data.consumerfinance.gov", 0, "JSON", readFile("large.json", "UTF-8"), readFileBytes("large.json", "UTF-8",ParserService.HEADER_LENGTH)},
-                {"https://data.consumerfinance.gov", 1000, "CSV", readFile("large.csv", "UTF-8"), readFileLines("large.csv", "UTF-8", 1).trim()},
-                {"https://data.consumerfinance.gov/file.xml", 0, "XML", readFile("large.csv", "UTF-8"), readFileBytes("large.csv", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 1001, "CSV", readFile("large.csv", "UTF-8"), readFileLines("large.csv", "UTF-8", 1).trim()},
+                {"https://data.consumerfinance.gov/file.xml", 0, "XML", readFile("large.csv", "UTF-8"), readFileBytes("large.csv", "UTF-8", ParserService.HEADER_LENGTH)},
                 {"https://not_supported_file_extension.org/test.AVR", 0, "AVR", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8",ParserService.HEADER_LENGTH)},
                 {"https://wp.pl", 0, "HTML", readFile("sample_html.txt", "UTF-8"), readFileBytes("sample_html.txt", "UTF-8",ParserService.HEADER_LENGTH)},
-                {"https://data.consumerfinance.gov", 4, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()}
+                {"https://data.consumerfinance.gov", 5, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
+                {"https://data.consumerfinance.gov", 0, "CSV", readFile("empty.csv", "UTF-8"), readFileLines("empty.csv", "UTF-8", 0).trim()},
+                {"https://data.consumerfinance.gov/data.xml", 0, "XML", readFile("empty.xml", "UTF-8"), readFile("empty.xml", "UTF-8")},
         });
     }
 

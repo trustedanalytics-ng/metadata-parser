@@ -15,16 +15,16 @@
  */
 package org.trustedanalytics.metadata.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.trustedanalytics.metadata.exceptions.InputStreamParseException;
 import org.trustedanalytics.metadata.parser.ParserService;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 
 import com.google.common.base.Throwables;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class ContentParsingUtils {
 
@@ -36,25 +36,21 @@ public class ContentParsingUtils {
         char[] buffer = new char[ParserService.BUFFER_SIZE];
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
-            String headerRow = reader.readLine();
-            if (headerRow == null) {
-                throw new InputStreamParseException("Error parsing input stream: the file is empty");
+            final String headerRow = reader.readLine();
+            if (headerRow != null) {
+                metadata.setDataSample(headerRow);
+                size += metadata.getDataSample().length();
+                recordCount += 1;
+
+                while ((loaded = reader.read(buffer)) != -1) {
+                    size += loaded;
+                    recordCount += findOccurrences(buffer, ParserService.RECORD_SEPARATOR, loaded);
+                }
+
+                if (size > headerRow.length()) {
+                    size++; // include newline between header row and rest of the rows
+                }
             }
-
-            String sample = headerRow;
-            metadata.setDataSample(sample);
-            size += metadata.getDataSample().length();
-
-            while ((loaded = reader.read(buffer)) != -1) {
-                size += loaded;
-                recordCount += ContentParsingUtils.findOccurrences(buffer,
-                        ParserService.RECORD_SEPARATOR, loaded);
-            }
-
-            if (size > headerRow.length()) {
-                size++; // include newline between header row and rest of the rows
-            }
-
         } catch (IOException|InputStreamParseException e) {
             Throwables.propagate(e);
         }
@@ -75,10 +71,13 @@ public class ContentParsingUtils {
         char[] buffer = new char[ParserService.BUFFER_SIZE];
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             loaded = reader.read(header);
-            metadata.setDataSample(new String(header, 0, loaded));
-            size += loaded;
-            while ((loaded = reader.read(buffer)) != -1) {
+            // is file not empty
+            if(loaded > 0) {
+                metadata.setDataSample(new String(header, 0, loaded));
                 size += loaded;
+                while ((loaded = reader.read(buffer)) != -1) {
+                    size += loaded;
+                }
             }
         } catch (IOException e) {
             Throwables.propagate(e);

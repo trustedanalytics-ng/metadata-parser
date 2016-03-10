@@ -17,14 +17,17 @@ package org.trustedanalytics.metadata.parser.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
 import java.io.IOException;
 import java.util.UUID;
 
+import lombok.Data;
+
 /**
  * Metadata representation. This object is passed to Data Catalog. It needs to
- * be serialized in a strict way to be readable by the Data Catalog.
+ * be serialized in a strict way to be readable by the Data Catalog. By default
+ * we are dealing with empty file and therefore data sample is empty string and
+ * record count is set to 0.
  */
 @Data
 public class Metadata {
@@ -53,7 +56,9 @@ public class Metadata {
         category = request.getCategory();
         orgUUID = request.getOrgUUID();
         isPublic = request.isPublicRequest();
-        sourceUri = request.getSource().toString();
+        sourceUri = request.getSource();
+        dataSample = "";
+        recordCount = 0;
     }
 
     @JsonIgnore
