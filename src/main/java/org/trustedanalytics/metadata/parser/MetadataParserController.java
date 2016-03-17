@@ -57,7 +57,10 @@ public class MetadataParserController {
     this.restOperationsFactory = restOperationsFactory;
   }
 
-  @ApiOperation("Extracting basic information about dataset and adding it to datacatalog")
+  @ApiOperation(
+          value = "Extracting basic information about dataset and adding it to datacatalog.",
+          notes = "Privilege level: Consumer of this endpoint must be a member of specified organization."
+  )
   @RequestMapping(method = POST)
   @ResponseStatus(ACCEPTED)
   public void extractMetadata(@RequestBody MetadataParseRequest request)
