@@ -34,6 +34,9 @@ public class ContentDetectionUtils {
     public static final int MAX_BYTES_READ_WHILE_PROBING_TYPE = 2048;
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentDetectionUtils.class);
 
+    private ContentDetectionUtils() {
+    };
+
     public static String bestGuessFileType(BufferedInputStream bin, String fileUri) throws IOException {
         
         Optional<MediaType> detectedType = Optional.empty();

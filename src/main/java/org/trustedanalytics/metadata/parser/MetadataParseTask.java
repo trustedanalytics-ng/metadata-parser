@@ -27,7 +27,6 @@ import org.springframework.web.client.RestOperations;
 
 import java.io.InputStream;
 
-//FIXME: There's something wrong about this class - to many dependencies, to little logic
 public class MetadataParseTask implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataParseTask.class);

@@ -28,6 +28,9 @@ import java.io.InputStreamReader;
 
 public class ContentParsingUtils {
 
+    private ContentParsingUtils() {
+    }
+
     public static Metadata parseCsv(Metadata metadata, InputStream in)
             throws IOException {
         long size = 0;
