@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/trustedanalytics/metadata-parser.svg?branch=master)](https://travis-ci.org/trustedanalytics/metadata-parser)
+[![Dependency Status](https://www.versioneye.com/user/projects/57236cdfba37ce004309f406/badge.svg?style=flat)](https://www.versioneye.com/user/projects/57236cdfba37ce004309f406)
+
 metadata-parser
 ===============
 
