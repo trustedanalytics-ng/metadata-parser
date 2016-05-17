@@ -35,11 +35,11 @@ public class ContentDetectionUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentDetectionUtils.class);
 
     private ContentDetectionUtils() {
-    };
+    }
 
     public static String bestGuessFileType(BufferedInputStream bin, String fileUri) throws IOException {
         
-        Optional<MediaType> detectedType = Optional.empty();
+        Optional<MediaType> detectedType;
         String fileExtension = getFileTypeFromExtension(fileUri);
         
         LOGGER.info("File extension : " + fileExtension);
