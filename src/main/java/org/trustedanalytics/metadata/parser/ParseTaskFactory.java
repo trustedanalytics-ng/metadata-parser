@@ -16,6 +16,7 @@
 package org.trustedanalytics.metadata.parser;
 
 import org.trustedanalytics.metadata.datacatalog.DataCatalog;
+import org.trustedanalytics.metadata.filesystem.FileSystemFactory;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
 import org.trustedanalytics.store.ObjectStore;
 import org.trustedanalytics.store.ObjectStoreFactory;
@@ -37,11 +38,13 @@ public class ParseTaskFactory {
 
     private final ObjectStoreFactory<UUID> objectStoreFactory;
     private final ParserService parserService;
+    private FileSystemFactory fileSystemFactory;
 
     @Autowired
-    public ParseTaskFactory(ObjectStoreFactory<UUID> objectStoreFactory, ParserService parserService) {
+    public ParseTaskFactory(ObjectStoreFactory<UUID> objectStoreFactory, ParserService parserService, FileSystemFactory fileSystemFactory) {
         this.objectStoreFactory = objectStoreFactory;
         this.parserService = parserService;
+        this.fileSystemFactory = fileSystemFactory;
     }
 
     public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog,
@@ -49,13 +52,17 @@ public class ParseTaskFactory {
 
         ObjectStore objectStore = objectStoreFactory.create(request.getOrgUUID());
 
-        if (request.isFullHdfsPath()) {
-            LOGGER.info("Adjusting hdfs request");
-            request.adjustHdfsRequest(objectStore.getId());
-        }
+        request.tryToIdentifyIdInObjectStore(objectStore.getId());
+        
+        request.createFullHdfsPathIfNotPresent(objectStore.getId());
 
         LOGGER.info("Creating task for request: " + request.toString());
-        return new MetadataParseTask(objectStore, dataCatalog, request, restOperations, parserService);
+        return new MetadataParseTask(objectStore,
+                                     dataCatalog,
+                                     request,
+                                     restOperations,
+                                     parserService,
+                                     fileSystemFactory.getFileSystem(request.getOrgUUID()));
     }
 
 }

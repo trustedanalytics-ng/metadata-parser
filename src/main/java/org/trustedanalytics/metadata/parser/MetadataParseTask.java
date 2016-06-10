@@ -15,6 +15,10 @@
  */
 package org.trustedanalytics.metadata.parser;
 
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.trustedanalytics.metadata.datacatalog.DataCatalog;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
@@ -25,7 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestOperations;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.*;
 
 public class MetadataParseTask implements Runnable {
 
@@ -36,23 +43,60 @@ public class MetadataParseTask implements Runnable {
     private final DataCatalog dataCatalog;
     private final RestOperations restTemplate;
     private final ParserService parserService;
+    private final FileSystem fileSystem;
 
-    public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService) {
+
+
+    public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService, FileSystem fileSystem) {
         this.objectStore = objectStore;
         this.request = metadataDescriptor;
         this.dataCatalog = dataCatalog;
         this.restTemplate = restTemplate;
         this.parserService = parserService;
+        this.fileSystem = fileSystem;
     }
 
     @Override
     public void run() {
-        try (InputStream in = objectStore.getContent(request.getIdInObjectStore())) {
+        Path sourcePath = new Path(request.getSource());
+        try (SequenceInputStream in = new SequenceInputStream(getInputStreamEnumeration(sourcePath))) {
             Metadata metadata = parserService.parse(request, objectStore.getId(), in);
             dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {
-            notifyFailed("Cannot parse the file "+request.getIdInObjectStore()+". "+e.getMessage(), e);
+            notifyFailed("Cannot parse resource " + request.getSource() + ". "+e.getMessage(), e);
+        }
+    }
+
+    private Enumeration<InputStream> getInputStreamEnumeration(Path sourcePath) {
+        List<InputStream> inputStreams = new ArrayList<>();
+
+        try {
+            if (fileSystem.isDirectory(sourcePath)) {
+                LOG.info("Directory recognized, searching for files");
+                processDirectory(sourcePath, inputStreams);
+            }
+            else {
+                processFile(sourcePath, inputStreams);
+            }
+        } catch (IOException e) {
+            notifyFailed("Cannot parse resource " + request.getSource() + ". " + e.getMessage(), e);
+        }
+        return Collections.enumeration(inputStreams);
+    }
+
+    private void processFile(Path sourcePath, List<InputStream> inputStreams) throws IOException {
+        inputStreams.add(fileSystem.open(sourcePath));
+    }
+
+    private void processDirectory(Path sourcePath, List<InputStream> inputStreams) throws IOException {
+        RemoteIterator<LocatedFileStatus> iterator = fileSystem.listFiles(sourcePath, false);
+        while (iterator.hasNext()) {
+            LocatedFileStatus status = iterator.next();
+            if (status.isFile()) {
+                LOG.info("File found: {}", status.getPath());
+                processFile(status.getPath(), inputStreams);
+            }
         }
     }
 

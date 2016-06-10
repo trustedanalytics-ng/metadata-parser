@@ -15,6 +15,7 @@
  */
 package org.trustedanalytics.metadata.parser;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.trustedanalytics.cloud.auth.AuthTokenRetriever;
 import org.trustedanalytics.cloud.auth.OAuth2TokenRetriever;
 import org.trustedanalytics.store.ObjectStoreConfiguration;

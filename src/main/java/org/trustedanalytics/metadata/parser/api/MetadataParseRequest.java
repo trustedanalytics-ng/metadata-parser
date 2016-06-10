@@ -49,15 +49,25 @@ public class MetadataParseRequest {
                 + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
     }
 
-    public void adjustHdfsRequest(String objectStoreId) throws HdfsRequestException {
-        int objectStorePartIdx = source.indexOf(objectStoreId);
-        if (objectStorePartIdx == -1) {
-            throw new HdfsRequestException("Hdfs path "+ source +" is outside current object store: " + objectStoreId);
-        }               
-        this.idInObjectStore = source.substring(objectStorePartIdx + objectStoreId.length());
-        LOGGER.info(toString());
+    public void createFullHdfsPathIfNotPresent(String objectStoreId) {
+        if (!isFullHdfsPath()) {
+            createFullHdfsPath(objectStoreId);
+        }
     }
-    
+
+    public void tryToIdentifyIdInObjectStore(String objectStoreId) {
+        int objectStorePartIdx = source.indexOf(objectStoreId);
+        if (isFullHdfsPath() && objectStorePartIdx != -1) {
+            this.idInObjectStore = source.substring(objectStorePartIdx + objectStoreId.length());
+            LOGGER.info("Id in object store: {}", this.idInObjectStore);
+        }
+    }
+
+    private void createFullHdfsPath(String objectStoreId) {
+        source = objectStoreId + "/" + this.idInObjectStore;
+    }
+
+
     @JsonIgnore
     public boolean isFullHdfsPath() {
         return source.contains(HDFS_FULL_PATH_INDICATOR);

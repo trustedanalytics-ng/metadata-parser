@@ -51,7 +51,7 @@ public class Metadata {
 
     public Metadata(MetadataParseRequest request, String storeId)
             throws IOException {
-        targetUri = buildTargetUri(storeId, request.getIdInObjectStore());
+        targetUri = buildTargetUri(storeId, request);
         title = request.getTitle();
         category = request.getCategory();
         orgUUID = request.getOrgUUID();
@@ -72,11 +72,17 @@ public class Metadata {
     }
 
     private static String buildTargetUri(String storeId,
-            String idInObjectStore) {
-        if (storeId.endsWith("/")) {
-            return storeId + idInObjectStore;
+            MetadataParseRequest request) {
+        if (request.isFullHdfsPath()) {
+            // if it's full hdfs path, then source is the same as target
+            return request.getSource();
         }
-        return storeId + "/" + idInObjectStore;
+        else {
+            if (storeId.endsWith("/")) {
+                return storeId + request.getIdInObjectStore();
+            }
+            return storeId + "/" + request.getIdInObjectStore();
+        }
     }
 
 }
