@@ -36,7 +36,7 @@ import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Component
-@Profile("cloud")
+@Profile({"multitenant-hdfs","cloud"})
 public class HdfsFileSystemFactory implements FileSystemFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HdfsFileSystemFactory.class);

@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Component
-@Profile("cloud")
+@Profile({"multitenant-hdfs","cloud"})
 public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
 
     private static final String AUTHENTICATION_METHOD = "kerberos";

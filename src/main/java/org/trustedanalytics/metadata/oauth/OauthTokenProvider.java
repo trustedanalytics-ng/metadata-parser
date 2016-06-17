@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.trustedanalytics.hadoop.config.client.oauth.TapOauthToken;
 
 @Component
-@Profile({"cloud","local"})
+@Profile({"multitenant-hdfs","local"})
 public class OauthTokenProvider implements TokenProvider {
     @Override
     public String getUserId() {

@@ -137,8 +137,8 @@ public class MetadataParserIT {
         when(authorization.checkAccess(any(), any())).thenReturn(success);
     }
 
-    @Test
     @Ignore
+    @Test
     public void parseMetadata_existingDataset()
         throws URISyntaxException, InterruptedException, ExecutionException, TimeoutException,
         IOException, ServletException {
