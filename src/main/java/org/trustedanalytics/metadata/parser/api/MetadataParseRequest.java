@@ -18,13 +18,13 @@ package org.trustedanalytics.metadata.parser.api;
 import java.net.URI;
 import java.util.UUID;
 
+import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
-import org.trustedanalytics.metadata.parser.HdfsRequestException;
 
 @Data
 public class MetadataParseRequest {
@@ -40,7 +40,7 @@ public class MetadataParseRequest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetadataParseRequest.class);
 
-    private static final CharSequence HDFS_FULL_PATH_INDICATOR = "hdfs://";
+
 
     @Override
     public String toString() {
@@ -49,27 +49,5 @@ public class MetadataParseRequest {
                 + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
     }
 
-    public void createFullHdfsPathIfNotPresent(String objectStoreId) {
-        if (!isFullHdfsPath()) {
-            createFullHdfsPath(objectStoreId);
-        }
-    }
 
-    public void tryToIdentifyIdInObjectStore(String objectStoreId) {
-        int objectStorePartIdx = source.indexOf(objectStoreId);
-        if (isFullHdfsPath() && objectStorePartIdx != -1) {
-            this.idInObjectStore = source.substring(objectStorePartIdx + objectStoreId.length());
-            LOGGER.info("Id in object store: {}", this.idInObjectStore);
-        }
-    }
-
-    private void createFullHdfsPath(String objectStoreId) {
-        source = objectStoreId + "/" + this.idInObjectStore;
-    }
-
-
-    @JsonIgnore
-    public boolean isFullHdfsPath() {
-        return source.contains(HDFS_FULL_PATH_INDICATOR);
-    }
 }

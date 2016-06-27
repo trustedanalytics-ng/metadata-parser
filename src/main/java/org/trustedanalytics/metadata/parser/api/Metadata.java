@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import lombok.Data;
+import org.trustedanalytics.metadata.parser.ParseTaskFactory;
 
 /**
  * Metadata representation. This object is passed to Data Catalog. It needs to
@@ -73,7 +74,7 @@ public class Metadata {
 
     private static String buildTargetUri(String storeId,
             MetadataParseRequest request) {
-        if (request.isFullHdfsPath()) {
+        if (ParseTaskFactory.isSourceFullHdfsPath(request)) {
             // if it's full hdfs path, then source is the same as target
             return request.getSource();
         }

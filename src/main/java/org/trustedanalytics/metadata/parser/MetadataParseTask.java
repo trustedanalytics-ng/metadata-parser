@@ -44,27 +44,27 @@ public class MetadataParseTask implements Runnable {
     private final RestOperations restTemplate;
     private final ParserService parserService;
     private final FileSystem fileSystem;
+    private final Path hdfsPath;
 
 
-
-    public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService, FileSystem fileSystem) {
+    public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService, FileSystem fileSystem, Path hdfsPath) {
         this.objectStore = objectStore;
         this.request = metadataDescriptor;
         this.dataCatalog = dataCatalog;
         this.restTemplate = restTemplate;
         this.parserService = parserService;
         this.fileSystem = fileSystem;
+        this.hdfsPath = hdfsPath;
     }
 
     @Override
     public void run() {
-        Path sourcePath = new Path(request.getSource());
-        try (SequenceInputStream in = new SequenceInputStream(getInputStreamEnumeration(sourcePath))) {
+        try (SequenceInputStream in = new SequenceInputStream(getInputStreamEnumeration(hdfsPath))) {
             Metadata metadata = parserService.parse(request, objectStore.getId(), in);
             dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {
-            notifyFailed("Cannot parse resource " + request.getSource() + ". "+e.getMessage(), e);
+            notifyFailed("Cannot parse resource " + hdfsPath + ". "+e.getMessage(), e);
         }
     }
 
