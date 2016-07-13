@@ -18,6 +18,7 @@ package org.trustedanalytics.metadata.parser;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import org.apache.commons.lang.StringUtils;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
 
@@ -94,6 +95,7 @@ public class ParseServiceTest {
                 {"https://wp.pl", 0, "HTML", readFile("sample_html.txt", "UTF-8"), readFileBytes("sample_html.txt", "UTF-8",ParserService.HEADER_LENGTH)},
                 {"https://data.consumerfinance.gov", 5, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
                 {"https://data.consumerfinance.gov", 0, "CSV", readFile("empty.csv", "UTF-8"), readFileLines("empty.csv", "UTF-8", 0).trim()},
+                {"hdfs://nameservice1/org/guid/brokers/userspace/teststore/inobjectstore/plik", 0, "CSV", readFile("empty.csv", "UTF-8"), readFileLines("empty.csv", "UTF-8", 0).trim()},
                 {"https://data.consumerfinance.gov/data.xml", 0, "XML", readFile("empty.xml", "UTF-8"), readFile("empty.xml", "UTF-8")},
         });
     }
@@ -110,10 +112,14 @@ public class ParseServiceTest {
         this.sourceUri = sourceUri;
         this.recordCount = recordCount;
         this.type = type;
-        this.content = content; 
-        this.targetUri = "teststore/inobjectstore";
+        this.content = content;
         this.header = header;
         this.size = content.length();
+        if (sourceUri.startsWith("hdfs://")) {
+            this.targetUri = this.sourceUri;
+        } else {
+            this.targetUri = "teststore/inobjectstore";
+        }
     }
 
     @Test

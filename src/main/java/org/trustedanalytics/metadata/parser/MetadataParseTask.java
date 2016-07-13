@@ -61,6 +61,9 @@ public class MetadataParseTask implements Runnable {
     public void run() {
         try (SequenceInputStream in = new SequenceInputStream(getInputStreamEnumeration(hdfsPath))) {
             Metadata metadata = parserService.parse(request, objectStore.getId(), in);
+            if (isDirectory(hdfsPath)) {
+                makeSureTargetPathEndsWithSlash(metadata);
+            }
             dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {
@@ -68,11 +71,17 @@ public class MetadataParseTask implements Runnable {
         }
     }
 
+    private void makeSureTargetPathEndsWithSlash(Metadata metadata) {
+        if (!metadata.getTargetUri().endsWith("/")) {
+            metadata.setTargetUri(metadata.getTargetUri() + "/");
+        }
+    }
+
     private Enumeration<InputStream> getInputStreamEnumeration(Path sourcePath) {
         List<InputStream> inputStreams = new ArrayList<>();
 
         try {
-            if (fileSystem.isDirectory(sourcePath)) {
+            if (isDirectory(sourcePath)) {
                 LOG.info("Directory recognized, searching for files");
                 processDirectory(sourcePath, inputStreams);
             }
@@ -83,6 +92,10 @@ public class MetadataParseTask implements Runnable {
             notifyFailed("Cannot parse resource " + request.getSource() + ". " + e.getMessage(), e);
         }
         return Collections.enumeration(inputStreams);
+    }
+
+    private boolean isDirectory(Path sourcePath) throws IOException {
+        return fileSystem.isDirectory(sourcePath);
     }
 
     private void processFile(Path sourcePath, List<InputStream> inputStreams) throws IOException {
