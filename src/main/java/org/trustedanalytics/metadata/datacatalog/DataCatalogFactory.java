@@ -23,7 +23,7 @@ import org.springframework.web.client.RestOperations;
 import java.util.Objects;
 
 @Service
-@Profile({"cloud", "default"})
+@Profile({"cloud", "default", "kube"})
 public class DataCatalogFactory {
 
   @Value("${dependencies.datacatalog}")

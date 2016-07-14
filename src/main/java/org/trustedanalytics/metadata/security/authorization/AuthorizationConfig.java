@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile({"cloud", "default"})
+@Profile({"cloud", "default", "kube"})
 public class AuthorizationConfig {
 
     @Value("${dependencies.user-management}")
