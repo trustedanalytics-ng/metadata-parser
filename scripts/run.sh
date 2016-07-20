@@ -19,4 +19,4 @@ SCRIPT_DIR=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 
 export VCAP_SERVICES=$($SCRIPT_DIR/hadoop2vcap_services.sh)
 
-java -jar $@
+java $JAVA_OPTS -jar $@

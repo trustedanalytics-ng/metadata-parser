@@ -235,6 +235,7 @@
         </resources>
         <env>
           <PORT>80</PORT>
+          <JAVA_OPTS>-Xmx500m</JAVA_OPTS>
         </env>
         <runs>
           <run>apt-get update</run>
