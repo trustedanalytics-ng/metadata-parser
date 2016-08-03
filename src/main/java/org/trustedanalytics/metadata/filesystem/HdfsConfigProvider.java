@@ -21,8 +21,6 @@ import java.util.UUID;
 
 public interface HdfsConfigProvider {
 
-    String KRB5_REALM = "java.security.krb5.realm";
-
     boolean isKerberosEnabled();
 
     String getHdfsUri();

@@ -15,16 +15,12 @@
  */
 package org.trustedanalytics.metadata.parser.api;
 
-import java.net.URI;
-import java.util.UUID;
-
-import org.apache.hadoop.fs.Path;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
+import java.net.URI;
+import java.util.UUID;
 
 @Data
 public class MetadataParseRequest {

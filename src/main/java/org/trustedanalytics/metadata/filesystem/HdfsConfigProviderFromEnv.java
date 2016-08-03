@@ -47,7 +47,6 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
     public HdfsConfigProviderFromEnv() throws IOException {
         AppConfiguration appConfiguration = Configurations.newInstanceFromEnv();
         hdfsConf = appConfiguration.getServiceConfig(ServiceType.HDFS_TYPE);
-        //krbConf = appConfiguration.getServiceConfig(ServiceType.KERBEROS_TYPE);
         krbConf = appConfiguration.getServiceConfig("kerberos-service");
         kdc = krbConf.getProperty(Property.KRB_KDC).get();
         realm = krbConf.getProperty(Property.KRB_REALM).get();

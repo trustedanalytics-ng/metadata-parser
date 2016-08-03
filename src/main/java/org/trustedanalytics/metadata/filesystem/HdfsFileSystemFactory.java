@@ -63,8 +63,6 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
     public FileSystem getFileSystem(String token, UUID org) {
         try {
 
-            //TODO START: this code is from hadoop-utils (95%),
-            // we need to change hadoop-utils to enable uri with templates like hdfs://name/org/%{organization}/catalog
             TapOauthToken jwtToken = new TapOauthToken(token);
 
             if (hdfsConfigProvider.isKerberosEnabled()) {
@@ -75,15 +73,14 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
 
             URI uri = new URI(hdfsConfigProvider.getHdfsOrgUri(org));
             return FileSystem.get(uri, hdfsConfigProvider.getHadoopConf(), jwtToken.getUserId());
-            //TODO END
 
         } catch (IOException | InterruptedException | URISyntaxException e) {
-            //TODO: must be thrown as 500
             LOGGER.error("Error while connecting hdfs", e);
+            throw new InternalError("Error while connecting hdfs");
         } catch (LoginException e) {
             LOGGER.error("Error while connecting hdfs", e);
+            throw new InternalError("Error while connecting hdfs");
         }
-        return null; //TODO: remove, when you rethrow IOException
     }
 
 
