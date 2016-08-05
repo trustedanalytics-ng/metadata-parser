@@ -16,8 +16,6 @@
 package org.trustedanalytics.metadata.parser.api;
 
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.UUID;
@@ -34,16 +32,11 @@ public class MetadataParseRequest {
     private UUID orgUUID;
     private boolean publicRequest;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MetadataParseRequest.class);
-
-
-
     @Override
     public String toString() {
         return "MetadataParseRequest [id=" + id + ", source=" + source + ", idInObjectStore="
                 + idInObjectStore + ", callbackUrl=" + callbackUrl + ", title=" + title
                 + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
     }
-
 
 }
