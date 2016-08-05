@@ -62,7 +62,6 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
 
     public FileSystem getFileSystem(String token, UUID org) {
         try {
-
             TapOauthToken jwtToken = new TapOauthToken(token);
 
             if (hdfsConfigProvider.isKerberosEnabled()) {
@@ -74,12 +73,9 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
             URI uri = new URI(hdfsConfigProvider.getHdfsOrgUri(org));
             return FileSystem.get(uri, hdfsConfigProvider.getHadoopConf(), jwtToken.getUserId());
 
-        } catch (IOException | InterruptedException | URISyntaxException e) {
-            LOGGER.error("Error while connecting hdfs", e);
-            throw new InternalError("Error while connecting hdfs");
-        } catch (LoginException e) {
-            LOGGER.error("Error while connecting hdfs", e);
-            throw new InternalError("Error while connecting hdfs");
+        } catch (IOException | InterruptedException | URISyntaxException | LoginException e) {
+            LOGGER.error("Exception occurred", e);
+            throw new IllegalStateException("Error while creating FileSystem object");
         }
     }
 
