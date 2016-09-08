@@ -67,7 +67,7 @@ public class MetadataParseTask implements Runnable {
             dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {
-            notifyFailed("Cannot parse resource " + hdfsPath + ". "+e.getMessage(), e);
+            notifyFailed(String.format("Cannot parse resource  %s . %s", hdfsPath, e.getMessage()), e);
         }
     }
 
@@ -77,19 +77,14 @@ public class MetadataParseTask implements Runnable {
         }
     }
 
-    private Enumeration<InputStream> getInputStreamEnumeration(Path sourcePath) {
+    private Enumeration<InputStream> getInputStreamEnumeration(Path sourcePath) throws IOException {
         List<InputStream> inputStreams = new ArrayList<>();
 
-        try {
-            if (isDirectory(sourcePath)) {
-                LOG.info("Directory recognized, searching for files");
-                processDirectory(sourcePath, inputStreams);
-            }
-            else {
-                processFile(sourcePath, inputStreams);
-            }
-        } catch (IOException e) {
-            notifyFailed("Cannot parse resource " + request.getSource() + ". " + e.getMessage(), e);
+        if (isDirectory(sourcePath)) {
+            LOG.info("Directory recognized, searching for files");
+            processDirectory(sourcePath, inputStreams);
+        } else {
+            processFile(sourcePath, inputStreams);
         }
         return Collections.enumeration(inputStreams);
     }
