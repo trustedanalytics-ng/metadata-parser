@@ -15,19 +15,20 @@
  */
 package org.trustedanalytics.metadata.filesystem;
 
-import com.google.common.collect.ImmutableMap;
-import lombok.Getter;
-import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.hadoop.conf.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.trustedanalytics.hadoop.config.client.*;
-
 import java.io.IOException;
 import java.util.UUID;
 
-@Component
-@Profile({"multitenant-hdfs","cloud"})
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.apache.hadoop.conf.Configuration;
+import org.trustedanalytics.hadoop.config.client.AppConfiguration;
+import org.trustedanalytics.hadoop.config.client.Property;
+import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
+import org.trustedanalytics.hadoop.config.client.ServiceType;
+
+import com.google.common.collect.ImmutableMap;
+
+import lombok.Getter;
+
 public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
 
     private static final String AUTHENTICATION_METHOD = "kerberos";
@@ -44,8 +45,14 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
     @Getter
     private final Configuration hadoopConf;
 
-    public HdfsConfigProviderFromEnv() throws IOException {
-        AppConfiguration appConfiguration = Configurations.newInstanceFromEnv();
+    public HdfsConfigProviderFromEnv(ServiceInstanceConfiguration hdfsConf) {
+      this.hdfsConf = hdfsConf;
+      kdc = hdfsConf.getProperty(Property.KRB_KDC).get();
+      realm = hdfsConf.getProperty(Property.KRB_REALM).get();
+      hadoopConf = hdfsConf.asHadoopConfiguration();
+    }
+
+    public HdfsConfigProviderFromEnv(AppConfiguration appConfiguration) throws IOException {
         hdfsConf = appConfiguration.getServiceConfig(ServiceType.HDFS_TYPE);
         krbConf = appConfiguration.getServiceConfig("kerberos-service");
         kdc = krbConf.getProperty(Property.KRB_KDC).get();

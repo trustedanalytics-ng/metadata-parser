@@ -2,8 +2,8 @@ server:
   port: 8900
 
 dependencies:
-  datacatalog: "${vcap.services.datacatalog.credentials.host:http://localhost:5000}"
-  user-management: "${user.management.host:http://localhost:9998}"
+  datacatalog: "${datacatalog.uri:http://localhost:5000}"
+  user-management: "${user.management.uri:http://localhost:9998}"
 
 security:
   ignored: /open,/sdoc.jsp,/*.js,/api-docs,/api-docs/default/*,/images/*,/lib/*,/css/*,/v2/api-docs
@@ -11,7 +11,7 @@ security:
 spring.oauth2.resource:
     id: cloud_controller
     jwt:
-      keyUri: ${vcap.services.sso.credentials.tokenKey}
+      keyUri: ${sso.tokenKey}
 
 logging:
   level:
@@ -19,8 +19,8 @@ logging:
     org.trustedanalytics: DEBUG
 
 cf:
-  resource: ${vcap.services.sso.credentials.apiEndpoint}
-  uaa: ${vcap.services.sso.credentials.uaaUri}
+  resource: ${sso.apiEndpoint}
+  uaa: ${sso.uaaUri}
 
 endpoints.enabled: false
 endpoints.health.enabled: true
