@@ -47,8 +47,8 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
 
     public HdfsConfigProviderFromEnv(ServiceInstanceConfiguration hdfsConf) {
       this.hdfsConf = hdfsConf;
-      kdc = hdfsConf.getProperty(Property.KRB_KDC).get();
-      realm = hdfsConf.getProperty(Property.KRB_REALM).get();
+      kdc = hdfsConf.getProperty(Property.KRB_KDC).orElse(null);
+      realm = hdfsConf.getProperty(Property.KRB_REALM).orElse(null);
       hadoopConf = hdfsConf.asHadoopConfiguration();
     }
 

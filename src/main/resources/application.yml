@@ -9,7 +9,7 @@ security:
   ignored: /open,/sdoc.jsp,/*.js,/api-docs,/api-docs/default/*,/images/*,/lib/*,/css/*,/v2/api-docs
 
 spring.oauth2.resource:
-    id: cloud_controller
+    id: tap
     jwt:
       keyUri: ${sso.tokenKey}
 
