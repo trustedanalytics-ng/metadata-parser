@@ -24,3 +24,12 @@ cf:
 
 endpoints.enabled: false
 endpoints.health.enabled: true
+
+hdfs:
+  configDir: /etc/hadoop/
+  uri: "hdfs://nameservice1/tmp/%{organization}/brokers/userspace/efeedfce-05f5-4600-95f8-efd1f6c480f4/"
+kerberos:
+  kdc: kdc.host.addr
+  realm: KDC_REALM_NAME
+  user: cf
+  pass: haselko

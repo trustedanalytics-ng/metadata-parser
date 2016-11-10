@@ -17,7 +17,6 @@ package org.trustedanalytics.metadata.parser;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.trustedanalytics.cloud.auth.AuthTokenRetriever;
 import org.trustedanalytics.cloud.auth.OAuth2TokenRetriever;
@@ -25,13 +24,13 @@ import org.trustedanalytics.hadoop.config.client.Configurations;
 import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
 import org.trustedanalytics.metadata.filesystem.HdfsConfigProvider;
 import org.trustedanalytics.metadata.filesystem.HdfsConfigProviderFromEnv;
-import org.trustedanalytics.store.ObjectStoreConfiguration;
+import org.trustedanalytics.store.EnableObjectStore;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Import(ObjectStoreConfiguration.class)
+@EnableObjectStore
 @Configuration
 public class MetadataConfiguration {
 
