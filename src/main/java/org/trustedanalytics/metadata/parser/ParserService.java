@@ -29,16 +29,11 @@ import java.io.InputStream;
 @Service
 public class ParserService {
 
-    public static final char RECORD_SEPARATOR = '\n';
-    public static final int HEADER_LENGTH = 256;
-    public static final int BUFFER_SIZE = 1000000;
-
-    public Metadata parse(MetadataParseRequest request, String storeId,
-            InputStream in) throws IOException {
+    public Metadata parse(MetadataParseRequest request, InputStream in) throws IOException {
         BufferedInputStream bin = new BufferedInputStream(in);
 
-        Metadata metadata = new Metadata(request, storeId);
-        
+        Metadata metadata = new Metadata(request);
+
         metadata.setFormat(ContentDetectionUtils.bestGuessFileType(bin, metadata.getSourceUri()));
 
         if (isCsv(metadata)) {

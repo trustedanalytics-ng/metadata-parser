@@ -48,6 +48,8 @@ import org.trustedanalytics.cloud.auth.AuthTokenRetriever;
 import org.trustedanalytics.cloud.auth.HeaderAddingHttpInterceptor;
 import org.trustedanalytics.metadata.Main;
 import org.trustedanalytics.metadata.datacatalog.DataCatalogFactory;
+import org.trustedanalytics.metadata.filesystem.FileSystemFactory;
+import org.trustedanalytics.metadata.filesystem.HdfsConfigProvider;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
 import org.trustedanalytics.metadata.parser.api.MetadataParseStatus;
@@ -280,6 +282,16 @@ public class MetadataParserIT {
         @Bean
         public DataCatalogFactory dataCatalogFactory() throws IOException, ServletException {
             return new RuntimeConfigurableDataCatalogFactory();
+        }
+
+        @Bean
+        public FileSystemFactory fileSystemFactory() {
+            return u -> null;
+        }
+
+        @Bean
+        public HdfsConfigProvider hdfsConfigProvider() {
+            return mock(HdfsConfigProvider.class);
         }
     }
 

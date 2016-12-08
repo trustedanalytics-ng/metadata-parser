@@ -16,37 +16,41 @@
 package org.trustedanalytics.metadata.parser;
 
 import org.apache.hadoop.fs.Path;
-import org.trustedanalytics.metadata.datacatalog.DataCatalog;
-import org.trustedanalytics.metadata.filesystem.FileSystemFactory;
-import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
-import org.trustedanalytics.store.ObjectStore;
-import org.trustedanalytics.store.ObjectStoreFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestOperations;
+import org.trustedanalytics.metadata.datacatalog.DataCatalog;
+import org.trustedanalytics.metadata.filesystem.FileSystemFactory;
+import org.trustedanalytics.metadata.filesystem.HdfsConfigProvider;
+import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
+import org.trustedanalytics.store.ObjectStore;
+import org.trustedanalytics.store.ObjectStoreFactory;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.util.UUID;
 
 @Service
 public class ParseTaskFactory {
 
-    private static final CharSequence HDFS_FULL_PATH_INDICATOR = "hdfs://";
+    private static final String HDFS_FULL_PATH_INDICATOR = "hdfs://";
     private static final Logger LOGGER = LoggerFactory.getLogger(ParseTaskFactory.class);
 
     private final ObjectStoreFactory<UUID> objectStoreFactory;
     private final ParserService parserService;
-    private FileSystemFactory fileSystemFactory;
+    private final FileSystemFactory fileSystemFactory;
+    private final HdfsConfigProvider hdfsConfigProvider;
 
     @Autowired
-    public ParseTaskFactory(ObjectStoreFactory<UUID> objectStoreFactory, ParserService parserService, FileSystemFactory fileSystemFactory) {
+    public ParseTaskFactory(ObjectStoreFactory<UUID> objectStoreFactory, ParserService parserService, FileSystemFactory fileSystemFactory, HdfsConfigProvider hdfsConfigProvider) {
         this.objectStoreFactory = objectStoreFactory;
         this.parserService = parserService;
         this.fileSystemFactory = fileSystemFactory;
+        this.hdfsConfigProvider = hdfsConfigProvider;
     }
 
     public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog,
@@ -54,40 +58,39 @@ public class ParseTaskFactory {
 
         ObjectStore objectStore = objectStoreFactory.create(request.getOrgUUID());
 
-        tryToIdentifyIdInObjectStore(request, objectStore.getId());
+        String targetUri = buildTargetUri(request.getSource(), objectStore.getId(),
+                request.getIdInObjectStore(), hdfsConfigProvider.getDefaultFs());
 
         LOGGER.info("Creating task for request: " + request.toString());
-        return new MetadataParseTask(objectStore,
-                                     dataCatalog,
+
+        return new MetadataParseTask(dataCatalog,
                                      request,
                                      restOperations,
                                      parserService,
                                      fileSystemFactory.getFileSystem(request.getOrgUUID()),
-                                     getDatasetPath(request, objectStore.getId())
+                                     new Path(targetUri)
         );
     }
 
-    public static boolean isSourceFullHdfsPath(MetadataParseRequest request) {
-        return request.getSource().contains(HDFS_FULL_PATH_INDICATOR);
-    }
-
-    private Path getDatasetPath(MetadataParseRequest request, String objectStoreId) {
-        if (!isSourceFullHdfsPath(request)) {
-            return createFullHdfsPath(request, objectStoreId);
+    static String buildTargetUri(String source, String objectStoreId, String objectId, URI defaultUri) {
+        // if it's full hdfs path, then source is the same as target
+        if (source.startsWith(HDFS_FULL_PATH_INDICATOR)) {
+            return source;
         }
-        return new Path(request.getSource());
-    }
 
-    private void tryToIdentifyIdInObjectStore(MetadataParseRequest request, String objectStoreId) {
-        if (isSourceFullHdfsPath(request) && request.getSource().contains(objectStoreId)) {
-            int objectStorePartIdx = request.getSource().indexOf(objectStoreId);
-            request.setIdInObjectStore(request.getSource().substring(objectStorePartIdx + objectStoreId.length()));
-            LOGGER.info("Id in object store: {}", request.getIdInObjectStore());
+        String path = objectStoreId;
+
+        // prepend path with defaultUri, if it's just a path without scheme spec
+        if (!objectStoreId.startsWith(HDFS_FULL_PATH_INDICATOR)) {
+            path = defaultUri + path;
         }
+
+        // ensure path ends with '/'
+        if (!objectStoreId.endsWith("/")) {
+            path += "/";
+        }
+
+        return path + objectId;
     }
 
-    private Path createFullHdfsPath(MetadataParseRequest request, String objectStoreId) {
-        return new Path(objectStoreId + "/" + request.getIdInObjectStore());
-    }
-    
 }

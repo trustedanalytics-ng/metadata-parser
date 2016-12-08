@@ -18,7 +18,6 @@ package org.trustedanalytics.metadata.parser;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.apache.commons.lang.StringUtils;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.trustedanalytics.metadata.parser.api.MetadataParseRequest;
 
@@ -27,6 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.trustedanalytics.metadata.utils.ContentParsingUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -87,12 +87,12 @@ public class ParseServiceTest {
                 {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample.json", "UTF-8"), readFile("sample.json", "UTF-8")},
                 {"https://data.consumerfinance.gov", 0, "XML", readFile("sample.xml", "UTF-8"), readFile("sample.xml", "UTF-8")},
                 {"https://data.consumerfinance.gov", 5, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
-                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8", ParserService.HEADER_LENGTH)},
-                {"https://data.consumerfinance.gov", 0, "JSON", readFile("large.json", "UTF-8"), readFileBytes("large.json", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8", ContentParsingUtils.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov", 0, "JSON", readFile("large.json", "UTF-8"), readFileBytes("large.json", "UTF-8", ContentParsingUtils.HEADER_LENGTH)},
                 {"https://data.consumerfinance.gov", 1001, "CSV", readFile("large.csv", "UTF-8"), readFileLines("large.csv", "UTF-8", 1).trim()},
-                {"https://data.consumerfinance.gov/file.xml", 0, "XML", readFile("large.csv", "UTF-8"), readFileBytes("large.csv", "UTF-8", ParserService.HEADER_LENGTH)},
-                {"https://not_supported_file_extension.org/test.AVR", 0, "AVR", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8",ParserService.HEADER_LENGTH)},
-                {"https://wp.pl", 0, "HTML", readFile("sample_html.txt", "UTF-8"), readFileBytes("sample_html.txt", "UTF-8",ParserService.HEADER_LENGTH)},
+                {"https://data.consumerfinance.gov/file.xml", 0, "XML", readFile("large.csv", "UTF-8"), readFileBytes("large.csv", "UTF-8", ContentParsingUtils.HEADER_LENGTH)},
+                {"https://not_supported_file_extension.org/test.AVR", 0, "AVR", readFile("sample2.json", "UTF-8"), readFileBytes("sample2.json", "UTF-8", ContentParsingUtils.HEADER_LENGTH)},
+                {"https://wp.pl", 0, "HTML", readFile("sample_html.txt", "UTF-8"), readFileBytes("sample_html.txt", "UTF-8", ContentParsingUtils.HEADER_LENGTH)},
                 {"https://data.consumerfinance.gov", 5, "CSV", readFile("sample.csv", "UTF-8"), readFileLines("sample.csv", "UTF-8", 1).trim()},
                 {"https://data.consumerfinance.gov", 0, "CSV", readFile("empty.csv", "UTF-8"), readFileLines("empty.csv", "UTF-8", 0).trim()},
                 {"hdfs://nameservice1/org/guid/brokers/userspace/teststore/inobjectstore/plik", 0, "CSV", readFile("empty.csv", "UTF-8"), readFileLines("empty.csv", "UTF-8", 0).trim()},
@@ -104,7 +104,6 @@ public class ParseServiceTest {
     private final long recordCount;
     private final String type;
     private final String content;
-    private final String targetUri;
     private final String header;
     private final int size;
     
@@ -115,11 +114,6 @@ public class ParseServiceTest {
         this.content = content;
         this.header = header;
         this.size = content.length();
-        if (sourceUri.startsWith("hdfs://")) {
-            this.targetUri = this.sourceUri;
-        } else {
-            this.targetUri = "teststore/inobjectstore";
-        }
     }
 
     @Test
@@ -129,7 +123,7 @@ public class ParseServiceTest {
         request.setSource(sourceUri);
         request.setOrgUUID(TEST_ORG_UUID);
 
-        Metadata metadata = new ParserService().parse(request, "teststore/", new ByteArrayInputStream(content.getBytes()));
+        Metadata metadata = new ParserService().parse(request, new ByteArrayInputStream(content.getBytes()));
 
         assertThat(metadata, equalTo(metadata()));
     }
@@ -141,7 +135,7 @@ public class ParseServiceTest {
         request.setSource(sourceUri);
         request.setOrgUUID(TEST_ORG_UUID);
 
-        Metadata metadata = new ParserService().parse(request, "teststore", new ByteArrayInputStream(content.getBytes()));
+        Metadata metadata = new ParserService().parse(request, new ByteArrayInputStream(content.getBytes()));
 
         assertThat(metadata, equalTo(metadata()));
     }
@@ -149,7 +143,6 @@ public class ParseServiceTest {
     private Metadata metadata() {
         Metadata metadata = new Metadata();
         metadata.setSourceUri(sourceUri);
-        metadata.setTargetUri(targetUri);
         metadata.setRecordCount(recordCount);
         metadata.setFormat(type);
         metadata.setDataSample(header);

@@ -17,6 +17,7 @@ package org.trustedanalytics.metadata.filesystem;
 
 import org.apache.hadoop.conf.Configuration;
 
+import java.net.URI;
 import java.util.UUID;
 
 public interface HdfsConfigProvider {
@@ -32,4 +33,6 @@ public interface HdfsConfigProvider {
     Configuration getHadoopConf();
 
     String getHdfsOrgUri(UUID org);
+
+    URI getDefaultFs();
 }

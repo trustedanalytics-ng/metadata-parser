@@ -38,7 +38,6 @@ public class MetadataParseTask implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataParseTask.class);
 
-    private final ObjectStore objectStore;
     private final MetadataParseRequest request;
     private final DataCatalog dataCatalog;
     private final RestOperations restTemplate;
@@ -47,8 +46,7 @@ public class MetadataParseTask implements Runnable {
     private final Path hdfsPath;
 
 
-    public MetadataParseTask(ObjectStore objectStore, DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService, FileSystem fileSystem, Path hdfsPath) {
-        this.objectStore = objectStore;
+    public MetadataParseTask(DataCatalog dataCatalog, MetadataParseRequest metadataDescriptor, RestOperations restTemplate, ParserService parserService, FileSystem fileSystem, Path hdfsPath) {
         this.request = metadataDescriptor;
         this.dataCatalog = dataCatalog;
         this.restTemplate = restTemplate;
@@ -60,10 +58,12 @@ public class MetadataParseTask implements Runnable {
     @Override
     public void run() {
         try (SequenceInputStream in = new SequenceInputStream(getInputStreamEnumeration(hdfsPath))) {
-            Metadata metadata = parserService.parse(request, objectStore.getId(), in);
+            Metadata metadata = parserService.parse(request, in);
+            metadata.setTargetUri(hdfsPath.toString());
             if (isDirectory(hdfsPath)) {
                 makeSureTargetPathEndsWithSlash(metadata);
             }
+
             dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {

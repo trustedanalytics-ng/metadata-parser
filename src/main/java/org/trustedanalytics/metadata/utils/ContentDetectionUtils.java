@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ContentDetectionUtils {
 
-    public static final int MAX_BYTES_READ_WHILE_PROBING_TYPE = 2048;
+    private static final int MAX_BYTES_READ_WHILE_PROBING_TYPE = 2048;
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentDetectionUtils.class);
 
     private ContentDetectionUtils() {

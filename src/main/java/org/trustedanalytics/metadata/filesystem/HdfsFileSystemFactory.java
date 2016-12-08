@@ -41,7 +41,7 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HdfsFileSystemFactory.class);
 
-    HdfsConfigProvider hdfsConfigProvider;
+    private final HdfsConfigProvider hdfsConfigProvider;
 
     @Autowired
     public HdfsFileSystemFactory(HdfsConfigProvider configProvider)  {

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import lombok.Data;
-import org.trustedanalytics.metadata.parser.ParseTaskFactory;
 
 /**
  * Metadata representation. This object is passed to Data Catalog. It needs to
@@ -50,9 +49,8 @@ public class Metadata {
 
     }
 
-    public Metadata(MetadataParseRequest request, String storeId)
+    public Metadata(MetadataParseRequest request)
             throws IOException {
-        targetUri = buildTargetUri(storeId, request);
         title = request.getTitle();
         category = request.getCategory();
         orgUUID = request.getOrgUUID();
@@ -70,20 +68,6 @@ public class Metadata {
     @JsonIgnore
     public void setPublic(boolean isPublic) {
         this.isPublic = isPublic;
-    }
-
-    private static String buildTargetUri(String storeId,
-            MetadataParseRequest request) {
-        if (ParseTaskFactory.isSourceFullHdfsPath(request)) {
-            // if it's full hdfs path, then source is the same as target
-            return request.getSource();
-        }
-        else {
-            if (storeId.endsWith("/")) {
-                return storeId + request.getIdInObjectStore();
-            }
-            return storeId + "/" + request.getIdInObjectStore();
-        }
     }
 
 }

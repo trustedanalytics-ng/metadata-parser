@@ -16,7 +16,6 @@
 package org.trustedanalytics.metadata.utils;
 
 import org.trustedanalytics.metadata.exceptions.InputStreamParseException;
-import org.trustedanalytics.metadata.parser.ParserService;
 import org.trustedanalytics.metadata.parser.api.Metadata;
 
 import com.google.common.base.Throwables;
@@ -28,15 +27,18 @@ import java.io.InputStreamReader;
 
 public class ContentParsingUtils {
 
+    public static final int HEADER_LENGTH = 256;
+    private static final char RECORD_SEPARATOR = '\n';
+    private static final int BUFFER_SIZE = 1000000;
+
     private ContentParsingUtils() {
     }
 
     public static Metadata parseCsv(Metadata metadata, InputStream in)
             throws IOException {
         long size = 0;
-        int loaded = 0;
         long recordCount = 0;
-        char[] buffer = new char[ParserService.BUFFER_SIZE];
+        char[] buffer = new char[BUFFER_SIZE];
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))){
             final String headerRow = reader.readLine();
@@ -44,10 +46,10 @@ public class ContentParsingUtils {
                 metadata.setDataSample(headerRow);
                 size += metadata.getDataSample().length();
                 recordCount += 1;
-
+                int loaded;
                 while ((loaded = reader.read(buffer)) != -1) {
                     size += loaded;
-                    recordCount += findOccurrences(buffer, ParserService.RECORD_SEPARATOR, loaded);
+                    recordCount += findOccurrences(buffer, RECORD_SEPARATOR, loaded);
                 }
 
                 if (size > headerRow.length()) {
@@ -67,13 +69,12 @@ public class ContentParsingUtils {
     public static Metadata parseGenericFile(Metadata metadata, InputStream in)
             throws IOException {
         long size = 0;
-        int loaded = 0;
         long recordCount = 0;
 
-        char[] header = new char[ParserService.HEADER_LENGTH];
-        char[] buffer = new char[ParserService.BUFFER_SIZE];
+        char[] header = new char[HEADER_LENGTH];
+        char[] buffer = new char[BUFFER_SIZE];
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            loaded = reader.read(header);
+            int loaded = reader.read(header);
             // is file not empty
             if(loaded > 0) {
                 metadata.setDataSample(new String(header, 0, loaded));

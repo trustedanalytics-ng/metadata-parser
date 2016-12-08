@@ -16,10 +16,12 @@
 package org.trustedanalytics.metadata.filesystem;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.UUID;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.trustedanalytics.hadoop.config.client.AppConfiguration;
 import org.trustedanalytics.hadoop.config.client.Property;
 import org.trustedanalytics.hadoop.config.client.ServiceInstanceConfiguration;
@@ -73,6 +75,11 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
     @Override
     public String getHdfsOrgUri(UUID org) {
         return PathTemplate.resolveOrg(hdfsConf.getProperty(Property.HDFS_URI).get(), org);
+    }
+
+    @Override
+    public URI getDefaultFs() {
+        return FileSystem.getDefaultUri(getHadoopConf());
     }
 
     private static class PathTemplate {
