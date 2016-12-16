@@ -6,7 +6,7 @@ dependencies:
   user-management: "${user.management.uri:http://localhost:9998}"
 
 security:
-  ignored: /open,/sdoc.jsp,/*.js,/api-docs,/api-docs/default/*,/images/*,/lib/*,/css/*,/v2/api-docs
+  ignored: /open,/sdoc.jsp,/*.js,/api-docs,/api-docs/default/*,/images/*,/lib/*,/css/*,/v2/api-docs,/health
 
 spring.oauth2.resource:
     id: tap
