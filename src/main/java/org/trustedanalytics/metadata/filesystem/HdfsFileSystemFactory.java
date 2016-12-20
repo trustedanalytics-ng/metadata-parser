@@ -49,7 +49,7 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
     }
 
     @Override
-    public FileSystem getFileSystem(UUID org) {
+    public FileSystem getFileSystem(String org) {
         return getFileSystem(getOAuthToken(), org);
     }
 
@@ -60,7 +60,7 @@ public class HdfsFileSystemFactory implements FileSystemFactory {
         return details.getTokenValue();
     }
 
-    public FileSystem getFileSystem(String token, UUID org) {
+    public FileSystem getFileSystem(String token, String org) {
         try {
             TapOauthToken jwtToken = new TapOauthToken(token);
 

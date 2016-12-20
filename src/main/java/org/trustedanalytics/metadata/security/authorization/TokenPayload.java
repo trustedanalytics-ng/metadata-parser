@@ -18,19 +18,18 @@ package org.trustedanalytics.metadata.security.authorization;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenPayload {
 
     @JsonProperty("user_id")
-    private UUID userId;
+    private String userId;
 
-    public UUID getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 }

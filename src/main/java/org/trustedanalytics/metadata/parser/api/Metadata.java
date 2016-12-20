@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import lombok.Data;
 
@@ -39,8 +38,10 @@ public class Metadata {
     private String format;
     private long recordCount;
     private String title;    
-    private String category;    
-    private UUID orgUUID;
+    private String category;
+
+    @JsonProperty("orgUUID")
+    private String orgID;
 
     @JsonProperty("isPublic")
     private boolean isPublic;
@@ -53,7 +54,7 @@ public class Metadata {
             throws IOException {
         title = request.getTitle();
         category = request.getCategory();
-        orgUUID = request.getOrgUUID();
+        orgID = request.getOrgID();
         isPublic = request.isPublicRequest();
         sourceUri = request.getSource();
         dataSample = "";

@@ -41,7 +41,7 @@ import java.util.UUID;
 @RunWith(Parameterized.class)
 public class ParseServiceTest {
 
-    private static final UUID TEST_ORG_UUID = UUID.fromString("09b11c7b-47f7-464f-b146-93b286bce677");
+    private static final String TEST_ORG_ID = "09b11c7b-47f7-464f-b146-93b286bce677";
     
     private static String readFile(String fileName, String encoding) throws IOException {        
         InputStream in = ParseServiceTest.class.getClassLoader().getResourceAsStream(fileName);
@@ -121,7 +121,7 @@ public class ParseServiceTest {
         MetadataParseRequest request = new MetadataParseRequest();
         request.setIdInObjectStore("inobjectstore");
         request.setSource(sourceUri);
-        request.setOrgUUID(TEST_ORG_UUID);
+        request.setOrgID(TEST_ORG_ID);
 
         Metadata metadata = new ParserService().parse(request, new ByteArrayInputStream(content.getBytes()));
 
@@ -133,7 +133,7 @@ public class ParseServiceTest {
         MetadataParseRequest request = new MetadataParseRequest();
         request.setIdInObjectStore("inobjectstore");
         request.setSource(sourceUri);
-        request.setOrgUUID(TEST_ORG_UUID);
+        request.setOrgID(TEST_ORG_ID);
 
         Metadata metadata = new ParserService().parse(request, new ByteArrayInputStream(content.getBytes()));
 
@@ -147,7 +147,7 @@ public class ParseServiceTest {
         metadata.setFormat(type);
         metadata.setDataSample(header);
         metadata.setSize(size);
-        metadata.setOrgUUID(TEST_ORG_UUID);
+        metadata.setOrgID(TEST_ORG_ID);
         
         return metadata;
     }

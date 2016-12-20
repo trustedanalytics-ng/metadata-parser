@@ -64,7 +64,7 @@ public class MetadataParseTask implements Runnable {
                 makeSureTargetPathEndsWithSlash(metadata);
             }
 
-            dataCatalog.putMetadata(request.getOrgUUID(), request.getId(), metadata);
+            dataCatalog.putMetadata(request.getOrgID(), request.getId(), metadata);
             notifyDone();
         } catch (Exception e) {
             notifyFailed(String.format("Cannot parse resource  %s . %s", hdfsPath, e.getMessage()), e);

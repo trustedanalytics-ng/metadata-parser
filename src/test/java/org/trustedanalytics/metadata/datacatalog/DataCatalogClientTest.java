@@ -59,7 +59,7 @@ public class DataCatalogClientTest {
         meta.setDataSample(properSerilizedValues.get("dataSample"));
         meta.setFormat(properSerilizedValues.get("format"));
         meta.setPublic(Boolean.valueOf(properSerilizedValues.get("isPublic")));
-        meta.setOrgUUID(UUID.fromString(properSerilizedValues.get("orgUUID")));
+        meta.setOrgID(properSerilizedValues.get("orgUUID"));
         meta.setRecordCount(Integer.valueOf(properSerilizedValues.get("recordCount")));
         meta.setSize(Integer.valueOf(properSerilizedValues.get("size")));
         meta.setSourceUri(properSerilizedValues.get("sourceUri"));

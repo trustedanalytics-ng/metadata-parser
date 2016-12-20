@@ -30,7 +30,6 @@ import org.trustedanalytics.store.ObjectStoreFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 
@@ -40,13 +39,13 @@ public class ParseTaskFactory {
     private static final String HDFS_FULL_PATH_INDICATOR = "hdfs://";
     private static final Logger LOGGER = LoggerFactory.getLogger(ParseTaskFactory.class);
 
-    private final ObjectStoreFactory<UUID> objectStoreFactory;
+    private final ObjectStoreFactory<String> objectStoreFactory;
     private final ParserService parserService;
     private final FileSystemFactory fileSystemFactory;
     private final HdfsConfigProvider hdfsConfigProvider;
 
     @Autowired
-    public ParseTaskFactory(ObjectStoreFactory<UUID> objectStoreFactory, ParserService parserService, FileSystemFactory fileSystemFactory, HdfsConfigProvider hdfsConfigProvider) {
+    public ParseTaskFactory(ObjectStoreFactory<String> objectStoreFactory, ParserService parserService, FileSystemFactory fileSystemFactory, HdfsConfigProvider hdfsConfigProvider) {
         this.objectStoreFactory = objectStoreFactory;
         this.parserService = parserService;
         this.fileSystemFactory = fileSystemFactory;
@@ -56,7 +55,7 @@ public class ParseTaskFactory {
     public MetadataParseTask newParseTask(MetadataParseRequest request, DataCatalog dataCatalog,
         RestOperations restOperations) throws HdfsRequestException, IOException, LoginException, InterruptedException {
 
-        ObjectStore objectStore = objectStoreFactory.create(request.getOrgUUID());
+        ObjectStore objectStore = objectStoreFactory.create(request.getOrgID());
 
         String targetUri = buildTargetUri(request.getSource(), objectStore.getId(),
                 request.getIdInObjectStore(), hdfsConfigProvider.getDefaultFs());
@@ -67,7 +66,7 @@ public class ParseTaskFactory {
                                      request,
                                      restOperations,
                                      parserService,
-                                     fileSystemFactory.getFileSystem(request.getOrgUUID()),
+                                     fileSystemFactory.getFileSystem(request.getOrgID()),
                                      new Path(targetUri)
         );
     }

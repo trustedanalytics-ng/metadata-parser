@@ -22,5 +22,5 @@ import java.util.UUID;
 
 @FunctionalInterface
 public interface FileSystemFactory {
-    FileSystem getFileSystem(UUID org) throws IOException;
+    FileSystem getFileSystem(String org) throws IOException;
 }

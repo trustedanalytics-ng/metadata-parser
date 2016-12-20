@@ -26,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.UUID;
 
 public class PlatformAuthorization implements Authorization {
 
@@ -38,7 +37,7 @@ public class PlatformAuthorization implements Authorization {
         this.userManagementBaseUrl = userManagementBaseUrl;
     }
 
-    @Override public boolean checkAccess(HttpServletRequest request, UUID orgId)
+    @Override public boolean checkAccess(HttpServletRequest request, String orgId)
         throws IOException, ServletException {
 
         LOG.debug(String.format("Check if user can access org: '%s'", orgId));

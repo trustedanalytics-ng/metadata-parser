@@ -18,9 +18,8 @@ package org.trustedanalytics.metadata.security.authorization;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.UUID;
 
 public interface Authorization {
-    boolean checkAccess(HttpServletRequest request, UUID orgId)
+    boolean checkAccess(HttpServletRequest request, String orgId)
         throws IOException, ServletException;
 }

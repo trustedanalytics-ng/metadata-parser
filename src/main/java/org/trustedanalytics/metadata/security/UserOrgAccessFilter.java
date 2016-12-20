@@ -27,7 +27,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 
 public class UserOrgAccessFilter extends OncePerRequestFilter {
 
@@ -46,7 +45,7 @@ public class UserOrgAccessFilter extends OncePerRequestFilter {
 
         BufferedRequestWrapper request = new BufferedRequestWrapper(innerRequest);
 
-        UUID orgId;
+        String orgId;
         try {
             orgId = OrgGuidRetriever.getOrgGuidFromRequestBody(request.getBody());
             LOG.debug(String.format("Org user want to access: '%s'", orgId));

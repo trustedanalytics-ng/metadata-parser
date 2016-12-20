@@ -31,7 +31,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.UUID;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -42,8 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 public class UserOrgAccessFilterTest {
 
     private static final String TEST_VALID_UUID_STRING = "2a11907a-9086-40c8-bdb7-e96a4c688455";
-    private static final UUID TEST_VALID_UUID = UUID.fromString(TEST_VALID_UUID_STRING);
-    private static final String TEST_INVALID_UUID_STRING = "invalid uuid";
+    private static final String TEST_VALID_UUID = TEST_VALID_UUID_STRING;
+    private static final String TEST_INVALID_UUID_STRING = "invalid_uuid";
 
     private UserOrgAccessFilter sut;
 
@@ -111,14 +110,14 @@ public class UserOrgAccessFilterTest {
     }
 
     @Test
-    public void testDoFilterInternal_invalidOrg() throws ServletException, IOException {
+    public void testDoFilterInternal_validOrgNotUuid() throws ServletException, IOException {
 
         when(requestBodyReader.readLine()).thenReturn(requestBody(TEST_INVALID_UUID_STRING))
             .thenReturn(null);
 
         sut.doFilterInternal(request, response, filterChain);
 
-        verify(response).sendError(eq(404), any(String.class));
+        verify(response).sendError(eq(403), any(String.class));
         verify(filterChain, never()).doFilter(any(), any());
     }
 }

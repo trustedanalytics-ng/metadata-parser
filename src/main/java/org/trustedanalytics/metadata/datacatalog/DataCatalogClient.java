@@ -17,7 +17,6 @@ package org.trustedanalytics.metadata.datacatalog;
 
 import org.trustedanalytics.metadata.parser.api.Metadata;
 import org.springframework.web.client.RestOperations;
-import java.util.UUID;
 
 public class DataCatalogClient implements DataCatalog {
 
@@ -30,8 +29,8 @@ public class DataCatalogClient implements DataCatalog {
     }
 
     @Override
-    public void putMetadata(UUID orgUUID, String id, Metadata metadata) {
-        metadata.setOrgUUID(orgUUID);
+    public void putMetadata(String orgID, String id, Metadata metadata) {
+        metadata.setOrgID(orgID);
         restTemplate.put(endpointUrl+"/rest/datasets/{id}", metadata, id);
     }
 }

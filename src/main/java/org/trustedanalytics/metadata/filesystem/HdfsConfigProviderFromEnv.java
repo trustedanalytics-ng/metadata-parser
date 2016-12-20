@@ -17,7 +17,6 @@ package org.trustedanalytics.metadata.filesystem;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.UUID;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.hadoop.conf.Configuration;
@@ -73,7 +72,7 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
     }
 
     @Override
-    public String getHdfsOrgUri(UUID org) {
+    public String getHdfsOrgUri(String org) {
         return PathTemplate.resolveOrg(hdfsConf.getProperty(Property.HDFS_URI).get(), org);
     }
 
@@ -90,8 +89,8 @@ public class HdfsConfigProviderFromEnv implements HdfsConfigProvider {
         private PathTemplate() {
         }
 
-        private static String resolveOrg(String url, UUID org) {
-            ImmutableMap<String, UUID> values = ImmutableMap.of(ORG_PLACEHOLDER, org);
+        private static String resolveOrg(String url, String org) {
+            ImmutableMap<String, String> values = ImmutableMap.of(ORG_PLACEHOLDER, org);
             return new StrSubstitutor(values, PLACEHOLDER_PREFIX, PLACEHOLDER_SUFIX).replace(url);
         }
     }

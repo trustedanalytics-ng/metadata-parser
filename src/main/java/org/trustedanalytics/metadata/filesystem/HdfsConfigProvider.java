@@ -32,7 +32,7 @@ public interface HdfsConfigProvider {
 
     Configuration getHadoopConf();
 
-    String getHdfsOrgUri(UUID org);
+    String getHdfsOrgUri(String org);
 
     URI getDefaultFs();
 }

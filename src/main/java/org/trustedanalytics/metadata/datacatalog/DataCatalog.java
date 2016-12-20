@@ -17,8 +17,7 @@ package org.trustedanalytics.metadata.datacatalog;
 
 import org.trustedanalytics.metadata.parser.api.Metadata;
 
-import java.util.UUID;
 
 public interface DataCatalog {
-    void putMetadata(UUID orgUUID, String id, Metadata metadata);
+    void putMetadata(String orgID, String id, Metadata metadata);
 }

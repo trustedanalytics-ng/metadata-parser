@@ -15,10 +15,10 @@
  */
 package org.trustedanalytics.metadata.parser.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.net.URI;
-import java.util.UUID;
 
 @Data
 public class MetadataParseRequest {
@@ -29,14 +29,16 @@ public class MetadataParseRequest {
     private URI callbackUrl;
     private String title;
     private String category;
-    private UUID orgUUID;
+    @JsonProperty("orgUUID")
+    private String orgID;
+
     private boolean publicRequest;
 
     @Override
     public String toString() {
         return "MetadataParseRequest [id=" + id + ", source=" + source + ", idInObjectStore="
                 + idInObjectStore + ", callbackUrl=" + callbackUrl + ", title=" + title
-                + ", category=" + category + ", orgUUID=" + orgUUID + ", publicRequest=" + publicRequest + "]";
+                + ", category=" + category + ", orgUUID=" + orgID + ", publicRequest=" + publicRequest + "]";
     }
 
 }

@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class OrgGuidRetriever {
 
@@ -32,12 +31,12 @@ public class OrgGuidRetriever {
     private OrgGuidRetriever() {
     }
 
-    public static UUID getOrgGuidFromRequestBody(String body) {
+    public static String getOrgGuidFromRequestBody(String body) {
         LOG.info("." + body + ".");
         try {
             MetadataParseRequest request =
                 mapper.readValue(body, MetadataParseRequest.class);
-            return request.getOrgUUID();
+            return request.getOrgID();
         } catch (IOException e) {
             throw new IllegalArgumentException("Cannot parse request body", e);
         }

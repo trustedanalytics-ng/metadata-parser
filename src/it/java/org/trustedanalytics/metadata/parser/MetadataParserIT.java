@@ -65,7 +65,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -98,7 +97,7 @@ public class MetadataParserIT {
     @Autowired
     private String TOKEN;
     @Autowired
-    private ObjectStoreFactory<UUID> objectStoreFactory;
+    private ObjectStoreFactory<String> objectStoreFactory;
     @Autowired
     private MetadataParserCallback callback;
     @Autowired
@@ -118,8 +117,7 @@ public class MetadataParserIT {
     @Autowired
     private Authorization authorization;
 
-    private final static UUID TEST_ORG_UUID =
-        UUID.fromString("f02e100b-8390-463a-8165-180ea4dd88ee");
+    private final static String TEST_ORG_ID = "coreOrganization";
 
     @Before
     public void before() throws IOException, LoginException, InterruptedException {
@@ -152,7 +150,7 @@ public class MetadataParserIT {
         request.setIdInObjectStore(idInStore);
         request.setSource(source);
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
-        request.setOrgUUID(TEST_ORG_UUID);
+        request.setOrgID(TEST_ORG_ID);
 
         assertThat(postRequest(request,"/rest/datasets").getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(putMetadata.get(500, TimeUnit.MILLISECONDS), equalTo(metadata()));
@@ -160,7 +158,7 @@ public class MetadataParserIT {
         verify(callback, timeout(500))
             .statusUpdate(Matchers.eq(MetadataParseStatus.done()), eq(request.getId()));
         verify(authorization)
-            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_UUID));
+            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_ID));
     }
 
     @Test
@@ -174,13 +172,13 @@ public class MetadataParserIT {
         request.setIdInObjectStore(idInStore);
         request.setSource(source);
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
-        request.setOrgUUID(TEST_ORG_UUID);
+        request.setOrgID(TEST_ORG_ID);
         request.setPublicRequest(false);
 
         assertThat(postRequest(request).getStatusCode(), equalTo(HttpStatus.FORBIDDEN));
 
         verify(authorization)
-            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_UUID));
+            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_ID));
     }
 
     @Test
@@ -192,7 +190,7 @@ public class MetadataParserIT {
         request.setId("1234");
         request.setIdInObjectStore("not_existing_id");
         request.setCallbackUrl(new URI(baseUrl + "/callbacks/" + request.getId()));
-        request.setOrgUUID(TEST_ORG_UUID);
+        request.setOrgID(TEST_ORG_ID);
         request.setSource(source);
 
 
@@ -202,7 +200,7 @@ public class MetadataParserIT {
             .statusUpdate(eqState(MetadataParseStatus.State.FAILED), eq(request.getId()));
 
         verify(authorization)
-            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_UUID));
+            .checkAccess(any(HttpServletRequest.class), eq(TEST_ORG_ID));
     }
 
     private Metadata metadata() {
@@ -213,7 +211,7 @@ public class MetadataParserIT {
         metadata.setTargetUri("in_memory/1");
         metadata.setTitle("title");
         metadata.setSize(content.length());
-        metadata.setOrgUUID(TEST_ORG_UUID);
+        metadata.setOrgID(TEST_ORG_ID);
 
         return metadata;
     }
@@ -240,7 +238,7 @@ public class MetadataParserIT {
     public static class TestConfig {
 
         @Bean
-        public ObjectStoreFactory<UUID> objectStoreFactory() {
+        public ObjectStoreFactory<String> objectStoreFactory() {
             return (x) -> new MemoryObjectStore();
         }
 
